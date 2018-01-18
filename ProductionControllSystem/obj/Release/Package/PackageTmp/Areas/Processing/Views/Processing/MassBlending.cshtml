@@ -1,0 +1,1024 @@
+﻿@using ProductionControllSystem.Areas.Processing.Models;
+@using ClassLibrary.DatabaseModels;
+
+@model  MassBlendViewModel
+
+
+<title>@Model.View.Title</title>
+<h5>@Model.View.Title</h5>
+
+
+<ul class="nav nav-tabs" style="margin-bottom: 15px;">
+    <li class="active"><a href="#transfer" data-toggle="tab">Operation</a></li>
+    <li><a href="#container" data-toggle="tab">Vats</a></li>
+</ul>
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="transfer">
+
+        <div class="col-md-6 pull-left">
+            <form action="no-implementation" id="source-transfer-form" method="POST">
+                <div class="panel sub-content-panel col-md-12 pull-left">
+                    <div class="col-md-12">
+                        <div class="col-md-6 pull-left">
+                            <div id="name-group" class="form-group pull-left">
+                                    @if (Model.Container.Count > 0)
+                                    {
+                                        @Html.DropDownListFor(m => m.Container,
+                                  new SelectList(Model.Container,
+                               "Id", "ContainerName",
+                                        Model.Container.First().Id), new { @class = "form-control ", id = "Id", name = "Container" })
+                                    }
+                                    else
+                                    {
+                                        <label class="custom-label">No Vat.</label>
+                                    }
+                                </div>                            
+                            <div id="name-group" class="form-group pull-left">
+                                    @Html.DropDownListFor(m => m.LiquidTypeId,
+                                  new SelectList(Model.LiquidTypeId,
+                               "LiquidTypeId", "LiquidName",
+                                        Model.LiquidTypeId.First().LiquidTypeId), new { @class = "form-control disabled", id = "LiquidType", tabindex = "-1", name = "LiquidName" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="col-md-12" id="liquid-percentage-from">
+                                <div class="col-md-12 vat_div">
+                                    <div class="progress vertical-sibling">
+                                        <div class="progress-bar progress-bar-one progress-bar-striped " role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+                                        <div class="progress-bar progress-bar-two progress-bar-striped " role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width: 0%;background-color:black"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 grey-section">
+                        <h5>Current Status</h5>
+                        <div id="name-group" class="form-group col-md-4">
+                            <label for="name" class="custom-label">Mass(kg):</label>
+                            @Html.TextBoxFor(m => m.CurrentSourceMass, new { @class = "form-control disabled", tabindex = "-1", type = "number", step = "0.1" })
+                        </div>
+                        <div id="name-group" class="form-group col-md-4">
+                            <label for="name" class="custom-label">Bulk(l):</label>
+                            @Html.TextBoxFor(m => m.CurrentSourceBulk, new { @class = "form-control disabled", tabindex = "-1", required = "true", type = "number", step = "0.1" })
+                        </div>
+                        <div id="name-group" class="form-group col-md-4">
+                            <label for="name" class="custom-label">A/A(l):</label>
+                            @Html.TextBoxFor(m => m.CurrentSourceAbsolute, new { @class = "form-control disabled", tabindex = "-1", required = "true", type = "number", step = "0.1" })
+                        </div>
+                    </div>
+                        <div class="col-md-12">
+                            @if (Model.TransferUnit == "l")
+                            {
+                                <div id="name-group" class="form-group col-md-4">
+                                    <label for="name" class="custom-label">Cur. Dip(cm)</label>
+                                    @Html.TextBoxFor(m => m.Transfers.FirstOrDefault().CurrentDip, new { @class = "form-control disabled", required = "true", tabindex = "-1", type = "number", step = "0.1" })
+                                </div>
+                                <div id="name-group" class="form-group col-md-4">
+                                    <label for="name" class="custom-label">Final Dip (cm)</label>
+                                    @Html.TextBoxFor(m => m.Transfers.FirstOrDefault().FinalDip, new { @class = "form-control custom-text-box", required = "true", type = "number", step = "0.1", min = 0 })
+                                </div>
+                            }
+                            @if (Model.TransferUnit == "kg")
+                            {
+                                <div class="col-md-12">
+                                    <div id="name-group" class="form-group col-md-4">
+                                        <label for="name" class="custom-label">Mass(kg)</label>
+                                        @Html.TextBoxFor(m => m.Transfers.FirstOrDefault().Weight, new { @class = "form-control custom-text-box", required = "true", tabindex = "-1", type = "number", step = "0.1", min = "1" })
+                                    </div>
+                                    <div id="name-group" class="form-group col-md-4">
+                                        <label for="name" class="custom-label">Temperature(c)</label>
+                                        @Html.TextBoxFor(m => m.Transfers.FirstOrDefault().Temperature, new { @class = "form-control custom-text-box", type = "number", step = "0.5", min = "1" })
+                                    </div>
+                                    <div id="name-group" class="form-group col-md-4">
+                                        <label for="name" class="custom-label">Density(kg):</label>
+                                        @Html.TextBoxFor(m => m.Transfers.FirstOrDefault().Density, new { @class = "form-control custom-text-box", required = "true", type = "number", step = "0.1", min = "1" })
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div id="name-group" class="form-group col-md-4" style="padding-bottom:0px">
+                                        <label for="name" class="custom-label" style="padding-bottom:0px">Strength(%)</label>
+                                        @Html.TextBoxFor(m => m.Transfers.FirstOrDefault().Strength, new { @class = "form-control custom-text-box", type = "number", step = "0.1" })
+                                    </div>
+                                <div id="name-group" class="form-group col-md-5">
+                                    <label for="name" class="custom-label">Status : </label>
+                                    <div class="input-field" id="divStatus" style="margin-top:0px;">
+                                        @Html.DropDownListFor(m => m.Status,
+                                  new SelectList(Model.Status,
+                               "Id", "Status",
+                                        Model.Status.First().Id), new { @class = "form-control", id = "Id", name = "Status" })
+                                    </div>
+                                </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="col-md-12 info-section">
+                            <h5>Transfer Info</h5>
+                            <div id="name-group" class="form-group col-md-4">
+                                <label for="name" class="custom-label">Bulk(l):</label>
+                                @Html.TextBoxFor(m => m.Transfers.FirstOrDefault().BulkVolume, new { @class = "form-control disabled", tabindex = "-1", required = "true", type = "number", step = "0.1" })
+                            </div>
+                            <div id="name-group" class="form-group col-md-4">
+                                <label for="name" class="custom-label">A/A(l):</label>
+                                @Html.TextBoxFor(m => m.Transfers.FirstOrDefault().PureVolume, new { @class = "form-control disabled", tabindex = "-1", required = "true", type = "number", step = "0.1" })
+                            </div>
+                            <div id="name-group" class="form-group col-md-4">
+                                <label for="name" class="custom-label">Wastage(l)</label>
+                                @Html.TextBoxFor(m => m.Transfers.FirstOrDefault().Wastage, new { @class = "form-control disabled text-danger", required = "true", type = "text", tabindex = "-1", })
+                            </div>
+                        </div>
+
+                        <div id="name-group" class="form-group col-md-12 pull-right">
+                            <div id="transferButton" class="btn btn-primary btn-raised pull-right">Schedule</div>
+                        </div>
+                        <h5 class="@if (Model.View.ViewCode == "HSO") { <text>hidden</text> } ">Transfer Sources</h5>
+                        <div id="name-group" class="form-group row  @if (Model.View.ViewCode == "HSO") { <text>hidden</text> }">
+                            <table id="transfers-table" class="display table table-hover table-striped" cellspacing="0" width="100%"></table>
+                        </div>
+                    </div>
+                @Html.TextBoxFor(m => m.Transfers.FirstOrDefault().CreatedUser, new { @class = "form-control hidden" })
+                @Html.TextBoxFor(m => m.Transfers.FirstOrDefault().LocationId, new { @class = "form-control hidden" })
+            </form>
+        </div>
+        <form action="no-implementation" id="destination-transfer-form" method="POST">
+            <div class="col-md-6 pull-left">
+                <div class="panel sub-content-panel col-md-12 pull-right">
+                    <div class="col-md-12">
+                        <div class="col-md-7">
+                            <div id="name-group" class="form-group col-md-12">
+                                <label for="name" class="custom-label">To : </label>
+                                @if (Model.ToContainer.Count > 0)
+                                {
+                                    @Html.DropDownListFor(m => m.ToContainer,
+                                  new SelectList(Model.ToContainer,
+                               "Id", "ContainerName",
+                                        Model.ToContainer.First().Id), new { @class = "form-control", id = "Id", name = "ContainerName" })
+                                }
+                                else
+                                {
+                                    <label class="custom-label">No Vat.</label>
+                                }
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="name" class="custom-label">Blend: </label>
+                                @Html.DropDownListFor(m => m.LiquidTypeId,
+                                  new SelectList(Model.LiquidTypeId.FindAll(l => (l.Category =="PROD" && Model.View.ViewCode=="BVO") || ((l.Category =="RS"  || l.Category=="PB") && Model.View.ViewCode=="HSO") || (l.Category == "PROD" || l.Category == "CS" && Model.View.ViewCode == "AVO")),
+                               "LiquidTypeId", "LiquidName",
+                                        Model.LiquidTypeId.First().LiquidTypeId), new { @class = "form-control", id = "LiquidTypeId", tabindex = "-1", name = "LiquidName" })
+                            </div>
+                        </div>
+                        <div class="col-md-5" id="liquid-percentage-to">
+                            <div class="col-md-12 vat_div">
+                                <div class="progress vertical-sibling">
+                                    <div class="progress-bar progress-bar-one progress-bar-striped " role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"> </div>
+                                    <div class="progress-bar progress-bar-two progress-bar-striped " role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"> </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        @if (Model.TransferUnit == "l")
+                        {
+                            <div id="name-group" class="form-group col-md-6">
+                                <label for="name" class="custom-label">Cur. Dip (cm)</label>
+                                @Html.TextBoxFor(m => m.DestinationDepthFrom, new { @class = "form-control disabled", tabindex = "-1", required = "true", type = "number", step = "0.1" })
+                            </div>
+                            <div id="name-group" class="form-group col-md-6">
+                                <label for="name" class="custom-label">Final Dip (cm)</label>
+                                @Html.TextBoxFor(m => m.DestinationDepthTo, new { @class = "form-control custom-text-box", required = "true", type = "number", step = "0.1", min = 1 })
+                            </div>
+                        }
+                    </div>
+
+                    <div class="col-md-12">
+                        <div id="name-group" class="form-group col-md-5">
+                            <label for="name" class="custom-label">Operated Date</label>
+                            <span class="input-group-addon custom-datepicker form-control">
+                                <span class="glyphicon glyphicon-calendar date-icon"></span>
+                                @Html.TextBoxFor(m => m.TransferTime, new { @class = "datepicker form-control custom-text-box", required = "true", type = "text", disabled= "disabled" })
+                            </span>
+                        </div>
+                            <div id="name-group" class="form-group col-md-4 pull-right">
+                                <input type="submit" class="btn btn-default btn-raised pull-right disabled" value="Transfer" />
+                            </div>
+
+                    </div>
+                    <div class="hidden">
+                        @Html.TextBoxFor(m => m.CreatedUser, new { @class = "form-control hidden", type = "text" })
+                        @Html.TextBoxFor(m => m.TransferType, new { @class = "form-control hidden", type = "text" })
+                        @Html.TextBoxFor(m => m.LocationId, new { @class = "form-control hidden", type = "text" })
+                    </div>
+                </div>
+
+                <div class="panel sub-content-panel col-md-12 pull-left">
+                    <h5>Current Blend Status : </h5>
+                    <div class="col-md-12">
+                        <div id="name-group" class="form-group col-md-4">
+                            <label for="name" class="custom-label">Mass (kg):</label>
+                            @Html.TextBoxFor(m => m.NewMass, new { @class = "form-control disabled", required = "true", type = "number", tabindex = "-1", step = "0.1" })
+                        </div>
+                        <div id="name-group" class="form-group col-md-4">
+                            <label for="name" class="custom-label">Bulk(l):</label>
+                            @Html.TextBoxFor(m => m.NewDestinationBulk, new { @class = "form-control disabled", required = "true", type = "number", tabindex = "-1", step = "0.1" })
+                        </div>
+                        <div id="name-group" class="form-group col-md-4">
+                            <label for="name" class="custom-label">A/A(l):</label>
+                            @Html.TextBoxFor(m => m.NewDestinationPure, new { @class = "form-control disabled", required = "true", type = "number", tabindex = "-1", step = "0.1" })
+                        </div>
+
+                    </div>
+                    <div class="col-md-12">
+                        <table id="solution-table" class="display table table-hover table-striped" cellspacing="0" width="100%"></table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="tab-pane fade " id="container">
+        <div class="col-md-12 panel sub-content-panel pull-right">
+            <h5>Vats/Receivers</h5>
+            <table id="containers-table" class="display table table-hover table-striped" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Liquid Type Id</th>
+                        <th>Container Name</th>
+                        <th>Liquid Type</th>
+                        <th>
+                            @switch (Model.TransferUnit)
+                            {
+                                case "kg":
+                                    <text>Mass(kg)</text>
+                                    break;
+                                case "l":
+                                    <text>Cur.Dip</text>
+                                    break;
+                            }
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Container reciever in Model.AllContainers)
+                    {
+                        if (reciever.Id != "0")
+                        {
+                            <tr>
+                                <td>
+                                    @reciever.Id
+                                </td>
+                                <td>
+                                    @reciever.LiquidTypeId
+                                </td>
+                                <td>
+                                    @reciever.ContainerName
+                                </td>
+                                <td>
+                                    @if(reciever.FilledWeight <= 0)
+                                    {
+                                        <text>Empty</text>
+                                    }
+                                    else if (Model.LiquidTypeId.Find(l => l.LiquidTypeId == reciever.LiquidTypeId) != null)
+                                    {
+                                        if(Model.LiquidTypeId.Find(l => l.LiquidTypeId == reciever.LiquidTypeId).LiquidName != "Other")
+                                        {
+                                            @Model.LiquidTypeId.Find(l => l.LiquidTypeId == reciever.LiquidTypeId).LiquidName
+                                        }
+                                        else
+                                        {
+                                            <text>Empty</text>
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        <text>Unknown</text>
+                                    }
+                                </td>
+                                <td>
+                                    @switch (Model.TransferUnit)
+                                    {
+                                        case "kg":
+                                            @reciever.FilledWeight
+                                            break;
+                                        case "l":
+                                            @reciever.CurrentDepth
+                                            break;
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+@section script
+    {
+    <script>
+        var blendItems = null;
+        var Container = null;
+        var toContainer = null;
+        var Transfers = new Array();
+        var containersOfThisLocation = getContainersOfThisLocation();
+        var TransferUnit = "@Model.TransferUnit";
+        var DestinationTransferUnit = "@Model.TransferUnit";
+        var solutes = null;
+        var vatsTable = initiateTable1("containers-table",
+                                        {
+                                            "bLengthChange": false,
+                                            "columnDefs": [
+                                                                {
+                                                                    "targets": [0, 1],
+                                                                    "visible": false,
+                                                                    "searchable": false
+                                                                }
+                                            ]
+                                        }
+                                        , function () { }, function () { });
+
+        var transfersTable = initiateTable1("transfers-table",
+                        {
+                            "sDom": "t",
+                            "language": {
+                                "emptyTable": "Please add transfers"
+                            },
+                            "columnDefs": [
+                                                {
+                                                    @switch (Model.TransferUnit)
+                                                    {
+                                                    case "kg":
+                                                    <text>"targets": [0, 1, 2, 3, 10, 11],</text>
+                                                            break;
+                                                    }
+                                                    "visible": false,
+                                                    "searchable": false
+                                                }
+                            ]
+                                                 ,
+                            "bLengthChange": false,
+                            "aoColumns": [
+                                                          { "sTitle": "Container", "mData": "Container" },
+                                                          { "sTitle": "LiquidTypeId", "mData": "LiquidTypeId" },
+                                                          { "sTitle": "CreatedUser", "mData": "CreatedUser" },
+                                                          { "sTitle": "LocationId", "mData": "LocationId" },
+                                                          { "sTitle": "Container", "mData": "ContainerName" },
+                                                          { "sTitle": "Liquid", "mData": "LiquidName" },
+                                                          @switch (Model.TransferUnit)
+                                                          {
+                                                              case "kg":
+                                                                  <text>
+                                                          { "sTitle": "Mass (kg)", "mData": "Weight" },
+                                                          { "sTitle": "Bulk(l)", "mData": "BulkVolume" },
+                                                          { "sTitle": "Strength", "mData": "Strength" },
+                                                          { "sTitle": "A/A(l)", "mData": "PureVolume" },
+                                                                  </text>
+                                                                  break;
+                                                              case "l":
+                                                                  <text>
+                                                          { "sTitle": "Cur. Dip", "mData": "CurrentDip" },
+                                                          { "sTitle": "Final Dip", "mData": "FinalDip" },
+                                                          { "sTitle": "Bulk(l)", "mData": "BulkVolume" },
+                                                          { "sTitle": "Strength", "mData": "Strength" },
+                                                          { "sTitle": "A/A(l)", "mData": "PureVolume" },
+                                                                  </text>
+                                                                  break;
+                                                          }
+                                                          { "sTitle": "Density", "mData": "Density" },
+                                                          { "sTitle": "Temperatire", "mData": "Temperature" }
+                            ]
+
+                        }
+                    , function () { }, function () { });
+
+        var solutionTable = initiateTable1("solution-table",
+                                            {
+                                                "sDom": "t",
+                                                "language": {
+                                                    "emptyTable": "Please select a destination vat"
+                                                },
+                                                "columnDefs": [{
+                                                    "visible": false,
+                                                    "searchable": false
+                                                }
+                                                ],
+                                                "bLengthChange": false,
+                                                "aoColumns": [
+                                                          { "sTitle": "Liquid", "mData": "Liquid" },
+                                                          { "sTitle": "Mass(kg)", "mData": "Mass" },
+                                                          { "sTitle": "%", "mData": "Percentage" }
+                                                ]
+                                        , function () { }, function () { }
+                                            });
+
+        var containers = getTableData(vatsTable);
+        var opt;
+        function updateWastage() {
+
+            var currentAA = parseFloat($("input[name=CurrentSourceAbsolute]").val()) >= 0 ? parseFloat($("input[name=CurrentSourceAbsolute]").val()) : 0;
+            var transferAbsolute = parseFloat($("input[name=PureVolume]").val()) >= 0 ? parseFloat($("input[name=PureVolume]").val()) : 0;
+
+            $("input[name=Wastage]").val((transferAbsolute-currentAA).toFixed(1));
+        }
+
+        $("#destination-transfer-form").on('submit', function (event) {
+            var error = "";
+            error = $("input[name=TransferTime]").val() == "" ? error + '<div class="alert alert-danger col-md-12">Please enter transfer date.</div>' : error;
+            error = $("select[name=ToContainer]").val() == "0" ? error + '<div class="alert alert-danger col-md-12">Please select destination container.</div>' : error;
+
+            if (error != "") {
+                showModalMessage("Error", error);
+            } else {
+                var data = getFormValues("destination-transfer-form");
+                var transferData = new Array()
+                data["Transfers"] = transfersTable.rows().data();
+
+                for (var i = 0; i < data["Transfers"].length ; i++) {
+                    transferData.push(data["Transfers"][i]);
+                }
+                data["Transfers"] = transferData;
+
+                sendObjectToServer("../../@Model.View.PostUrl", data,
+                   function (data) {
+                       MaterialSelectReinitiate("#source-transfer-form select[name='Container']", 0)
+                       MaterialSelectReinitiate("#destination-transfer-form select[name='ToContainer']", 0)
+                       $("input[name=Density]").val("0");
+                       showModalMessage("Liquid Transfer success", "Liquid Transfered");
+                   }, function (data) {
+                       showModalMessage("Error", '<div class="alert alert-danger col-md-12">' + data + '</div>');
+                       console.log(data);
+                   });
+            }
+            event.preventDefault();
+        });
+
+        $("select[name=Container]").change(function () {
+            if ($(this).val() == "0") {
+
+                $("#liquid-percentage-from").removeAttr("style");
+                MaterialSelectReinitiate("#source-transfer-form select[name='LiquidTypeId']", 0)
+                $("input[name='CurrentDip']").val("0");
+                $("input[name='FinalDip']").val("0");
+                $("input[name='Strength']").val("0");
+                $("input[name='BulkVolume']").val("0");
+                $("input[name='PureVolume']").val("0");
+                $("input[name='Wastage']").val("0");
+                $("input[name='Wastage']").val("0");
+
+                var sourceDepth = !isNaN(parseFloat($("input[name=FinalDip]").val())) ? parseFloat($("input[name=FinalDip]").val()) : parseFloat($("input[name=CurrentDip]").val());
+                var destinationDepth = !isNaN(parseFloat($("input[name=DestinationDepthTo]").val())) ? parseFloat($("input[name=DestinationDepthTo]").val()) : parseFloat($("input[name=DestinationDepthFrom]").val());
+                updateContainerImages(0, sourceDepth, 0, destinationDepth);
+                return;
+            }
+            Container = getContainerFromDb("" + $(this).val() + "");
+            Container["containerName"] = $("select[name=Container] :selected").html();
+            var capacity = parseFloat((typeof Container["capacity"] != 'undefined' && Container["capacity"] != "") ? Container["capacity"] : "0");
+            var volume = parseFloat((typeof Container["fillVolume"] != 'undefined' && Container["fillVolume"] != "") ? Container["fillVolume"] : "0");
+            var pureVolume = parseFloat((typeof Container["pureVolume"] != 'undefined' && Container["pureVolume"] != "") ? Container["pureVolume"] : "0");
+            pureVolume = !isNaN(parseFloat(pureVolume)) ? parseFloat(pureVolume) : 0;
+            volume = !isNaN(parseFloat(volume)) ? parseFloat(volume) : 0;
+            switch(Container["containerType"] ){
+                case "LO":
+                    if ("@Model.LocationId" == "ES_PC") {
+                        MaterialSelectReinitiate("#source-transfer-form select[name='LiquidTypeId']", 2);
+                    }
+                    $("input[name=BulkVolume]").addClass("disabled");
+                    $("input[name=BulkVolume]").removeClass("custom-text-box");
+                    break;
+                case "EX":
+                    $("input[name=BulkVolume]").removeClass("disabled");
+                    $("input[name=BulkVolume]").addClass("custom-text-box");
+                    MaterialSelectReinitiate("#source-transfer-form select[name='LiquidTypeId']", Container["liquidTypeId"]);
+                    break;
+                case "BV":
+                    MaterialSelectReinitiate("#destination-transfer-form select[name='LiquidTypeId']", Container["liquidTypeId"]);
+                    MaterialSelectReinitiate("#source-transfer-form select[name='LiquidTypeId']", Container["liquidTypeId"])
+                    $("input[name=BulkVolume]").addClass("disabled");
+                    $("input[name=BulkVolume]").removeClass("custom-text-box");
+
+                    // show only relevant containers in tocontainer
+                    var options = '<option value="0" > Recieving Vat</option>';
+                    var transfers = getTableData(transfersTable);
+                    containers = getTableData(vatsTable);
+                    for (var containerIndex in containers) {
+                        var container = containers[containerIndex];
+                        console.log(container);
+                        var skip = false;
+                        if ( (Container["liquidTypeId"]!=container[1] && parseFloat(container[4]) > 0)|| Container["containerId"] == container[0]) {
+                            skip = true;
+                            continue;
+                        }
+                        // don't include anything thats already there in the transfer table
+                        for (var transferIndex in transfers) {
+                            var transfer = transfers[transferIndex];
+                            if (transfer["Container"] == container[0]) {
+                                skip = true;
+                                continue;
+                            }
+                        }
+
+                        options = skip ? options : options + '<option value=\"' + container[0] + '\" >' + container[2] + "</option>";
+                    }
+                    $("select[name=ToContainer]").html(options);
+                    MaterialSelectReinitiate("select[name=ToContainer]", 0);
+                    break;
+                case "AGV":
+                    MaterialSelectReinitiate("#destination-transfer-form select[name='LiquidTypeId']", Container["liquidTypeId"]);
+                    MaterialSelectReinitiate("#source-transfer-form select[name='LiquidTypeId']", Container["liquidTypeId"])
+                    $("input[name=BulkVolume]").addClass("disabled");
+                    $("input[name=BulkVolume]").removeClass("custom-text-box");
+                    var options = '<option value="0" > Recieving Vat</option>';
+
+                    containers = getTableData(vatsTable);
+                    console.log(options);
+                    for (var containerIndex in containers) {
+                        var container = containers[containerIndex];
+                        var skip = false;
+                        if ((Container["liquidTypeId"] != container[2] && parseFloat(container[4])>0 )|| Container["containerId"]==container[0]) {
+                            skip = true;
+                            continue;
+                        }
+                        options = skip ? options : options + '<option value=\"' + container[0] + '\" >' + container[2] + "</option>";
+                    }
+                    $("select[name=ToContainer]").html(options);
+                    MaterialSelectReinitiate("select[name=ToContainer]", 0);
+                    break;
+                default:
+                    $("input[name=BulkVolume]").addClass("disabled");
+                    $("input[name=BulkVolume]").removeClass("custom-text-box");
+                    MaterialSelectReinitiate("#source-transfer-form select[name='LiquidTypeId']", Container["liquidTypeId"])
+                    break;
+            }
+            @switch (Model.TransferUnit)
+                        {
+                            case "kg":
+                    <text>
+            var bulkVolume = 0;
+            var bulkWeight = 0;
+            var density =Container["density"] ;
+            var weight = density * bulkVolume;
+            weight = parseFloat(weight * 0.001).toFixed(0);
+            bulkVolume =parseFloat(weight / density*1000).toFixed(1);
+            $('input[name=BulkVolume]').val(bulkVolume);
+            $("input[name='CurrentSourceMass']").val(Container["fillWeight"]);
+            $("input[name='CurrentSourceBulk']").val(Container["fillVolume"]);
+            $("input[name='CurrentSourceAbsolute']").val(Container["pureVolume"]);
+            UpdateVatAnimation("liquid-percentage-from", (parseFloat(Container["fillWeight"]) / parseFloat(Container["capacityWeight"])) * 100, 0, Container);
+            </text>
+                                break;
+                            case "l":
+                    <text>
+
+            $("input[name='CurrentDip']").val(Container["currentDepth"]);
+            $("input[name='Strength']").val(Container["strength"]);
+            $("input[name='FinalDip']").attr("min", 0);
+            $("input[name='FinalDip']").attr("max", Container["currentDepth"]);
+            $("select[name=ToContainer]").html("");
+            $("input[name='Temperature']").val(Container["temperature"]);
+            $("input[name='Density']").val(Container["density"]);
+            </text>
+                                break;
+                        }
+
+            $("input[name='FinalDip']").val(0);
+            $("input[name='PureVolume']").val(0);
+            $("input[name='Wastage']").val(0);
+            $("input[name='Wastage']").val(0);
+            $("input[name='Strength']").val(0);
+            $("input[name='Temperature']").val(0);
+            $("input[name='Density']").val(0);
+
+            UpdateVatAnimation("liquid-percentage-to", 0, 0, null);
+            $("input[name='DestinationDepthFrom']").val("0");
+            $("input[name='DestinationDepthTo']").val("0");
+            $("input[name='DestinationDensity']").val("0");
+            $("input[name='DestinationTemperature']").val("0");
+            $("input[name='DestinationStrength']").val("0");
+            $("input[name='DestinationBulkVolume']").val("0");
+            $("input[name='DestinationPureVolume']").val("0");
+            $("input[name='Wastage']").val("0");
+
+            if (Container["containerType"] != "BV" && (Container["containerType"] != "AGV")) {
+
+            var options = '<option value="0" > Recieving Vat</option>';
+            var transfers = getTableData(transfersTable);
+
+            for (var containerIndex in containers) {
+                var container = containers[containerIndex];
+                var skip = false;
+                if (Container["containerId"] == container[0]) {
+                    skip = true;
+                    continue;
+                }
+                // don't include anything thats already there in the transfer table
+                for (var transferIndex in transfers) {
+                    var transfer = transfers[transferIndex];
+                    if (transfer["Container"] == container[0]) {
+                        skip = true;
+                        continue;
+                    }
+                }
+
+                options = skip ? options : options + '<option value=\"' + container[0] + '\" >' + container[2] + "</option>";
+            }
+
+            $("select[name=ToContainer]").html(options);
+            MaterialSelectReinitiate("select[name=ToContainer]", 0);
+            }
+        });
+
+        $("input[name='FinalDip']").change(function () {
+            var strength = (parseFloat(Container["pureVolume"]) / parseFloat(Container["fillVolume"])) * 100;
+            var containerId = $("select[name='Container']").val() != "" ? parseFloat($("select[name='Container']").val()) : 0;
+            var containerFromDepth = $("input[name='CurrentDip']").val() != "" ? parseFloat($("input[name='CurrentDip']").val()) : 0;
+            var containerToDepth = $(this).val() != "" ? parseFloat($(this).val()) : 0;
+            var volume = parseFloat(getVolume(containerId, containerFromDepth, containerToDepth));
+            var sourceDepth = !isNaN(parseFloat($("input[name=FinalDip]").val())) ? parseFloat($("input[name=FinalDip]").val()) : parseFloat($("input[name=CurrentDip]").val());
+            var destinationDepth = !isNaN(parseFloat($("input[name=DestinationDepthTo]").val())) ? parseFloat($("input[name=DestinationDepthTo]").val()) : parseFloat($("input[name=DestinationDepthFrom]").val());
+
+            strength = !isNaN(strength) ? parseFloat(strength) : 0;
+            volume = !isNaN(parseFloat(volume)) ? parseFloat(volume) : 0;
+            var addedPureVolume = parseFloat(Container["pureVolume"]) - (((parseFloat(Container["fillVolume"]) - volume) * strength) / 100);
+
+            $("input[name='BulkVolume']").val(volume.toFixed(1));
+            $("input[name='PureVolume']").val(addedPureVolume.toFixed(1));
+            updateWastage();
+            updateContainerImages(0, sourceDepth, 0, destinationDepth);
+        });
+
+        $("select[name=ToContainer]").change(function () {
+                if ($(this).val() == "0") {
+                    $("#liquid-percentage-from").removeAttr("style");
+                    MaterialSelectReinitiate("#destination-transfer-form select[name='LiquidTypeId']", 0)
+                    toContainer["currentDepth"] = 0;
+                    $("input[name='DestinationDepthFrom']").val("0");
+                    $("input[name='DestinationDepthTo']").val("0");
+                    $("input[name='DestinationDensity']").val("0");
+                    $("input[name='DestinationTemperature']").val("0");
+                    $("input[name='DestinationStrength']").val("0");
+                    $("input[name='DestinationBulkVolume']").val("0");
+                    $("input[name='DestinationPureVolume']").val("0");
+                    $("input[name='Wastage']").val("0");
+
+                    var sourceDepth = !isNaN(parseFloat($("input[name=FinalDip]").val())) ? parseFloat($("input[name=FinalDip]").val()) : parseFloat($("input[name=CurrentDip]").val());
+                    var destinationDepth = !isNaN(parseFloat($("input[name=DestinationDepthTo]").val())) ? parseFloat($("input[name=DestinationDepthTo]").val()) : parseFloat($("input[name=DestinationDepthFrom]").val());
+                return;
+            }
+                toContainer = getContainerFromDb("" + $(this).val() + "");
+
+                $("#liquid-percentage-from").removeAttr("style");
+                $("input[name='DestinationDepthFrom']").val(toContainer["currentDepth"]);
+                $("input[name='DestinationDepthTo']").val("0");
+                $("input[name='DestinationDensity']").val("0");
+                $("input[name='DestinationTemperature']").val("0");
+                $("input[name='DestinationStrength']").val("0");
+                $("input[name='DestinationBulkVolume']").val("0");
+                $("input[name='NewMass']").val(toContainer["fillWeight"]);
+                $("input[name='NewDestinationBulk']").val(toContainer["fillVolume"]);
+                $("input[name='NewDestinationPure']").val(toContainer["pureVolume"]);
+                $("input[name='Wastage']").val("0");
+
+                var sourceDepth = !isNaN(parseFloat($("input[name=FinalDip]").val())) ? parseFloat($("input[name=FinalDip]").val()) : parseFloat($("input[name=CurrentDip]").val());
+                var destinationDepth = !isNaN(parseFloat($("input[name=DestinationDepthTo]").val())) ? parseFloat($("input[name=DestinationDepthTo]").val()) : parseFloat($("input[name=DestinationDepthFrom]").val());
+                MaterialSelectReinitiate("#destination-transfer-form select[name='LiquidTypeId']", toContainer["liquidTypeId"]);
+                UpdateVatAnimation("liquid-percentage-to", (parseFloat(toContainer["fillWeight"]) / parseFloat(toContainer["capacityWeight"])) * 100, 0, toContainer);
+            
+                if (parseFloat(toContainer["solutionId"]) > -1) {
+                    $.ajax({
+                        type: 'get',
+                        url: "../../api/GetSolution?solutionId=" + toContainer["solutionId"],
+                        dataType: 'json',
+                        async: false,
+                        contentType: 'application/json',
+                        success: function (response) {
+                            reportTableId = "solution-table";
+                            if (response == null) {
+                                $("#solution-table tbody").html("");
+                                if (solutionTable != null) {
+                                    $("#" + reportTableId).DataTable().destroy();
+                                }
+                                return;
+                            }
+                            if (!(response["SolutesOfSolution"].length > 0)) {
+                                $("#solution-table tbody").html("");
+                                if (solutionTable != null) {
+                                    $("#" + reportTableId).DataTable().destroy();
+                                }
+                                return;
+                            }
+
+                            solutes = response["SolutesOfSolution"];
+                            solutionTable=  initiateTable1("solution-table",
+                                                    {
+                                                        "sDom": "t",
+                                                        "language": {
+                                                            "emptyTable": "Please select a destination vat"
+                                                        },
+                                                        "columnDefs": [{
+                                                            "visible": false,
+                                                            "searchable": false
+                                                        }],
+                                                        "aaData": solutes,
+                                                        "bLengthChange": false,
+                                                        "aoColumns": [
+                                                                  { "sTitle": "Liquid", "mData": "liquidType" },
+                                                                  { "sTitle": "Mass(kg)", "mData": "bulkWeight" },
+                                                                  { "sTitle": "Strength", "mData": "strength" },
+                                                                  { "sTitle": "Percentage", "mData": "percentage" }
+                                                        ]
+                                                , function () { }, function () { }
+                                                    });
+                        },
+                        error: function (exception) {                           
+                            $("#solution-table tbody").html("");
+                            $("#" + reportTableId).DataTable().destroy();
+                        }
+                    });
+                }
+        });
+
+        $('#destination-transfer-form input').change(function () {
+            UpdateDestinationForm($(this).attr("name"));
+        });
+
+        $('#source-transfer-form input').change(function () {
+            UpdateSourceForm($(this).attr("name"));
+        });
+
+        $("input[name='DestinationDepthTo']").change(function () {
+            var strength = parseFloat($("#input[name='DestinationStrength']").val() != "" || $("input[name='DestinationStrength']").val() != "Error" ? parseFloat($("input[name='DestinationStrength']").val()) : 0);
+            var density = parseFloat($("input[name='DestinationDensity']").val());
+            var containerId = $("select[name='ToContainer']").val() != "" ? parseFloat($("select[name='ToContainer']").val()) : 0;
+            var containerFromDepth = $("input[name='DestinationDepthFrom']").val() != "" ? parseFloat($("input[name='DestinationDepthFrom']").val()) : 0;
+            var containerToDepth = $(this).val() != "" ? parseFloat($(this).val()) : 0;
+            var volume = parseFloat(getVolume(containerId, containerFromDepth, containerToDepth));
+            var sourceDepth = !isNaN(parseFloat($("input[name=FinalDip]").val())) ? parseFloat($("input[name=FinalDip]").val()) : parseFloat($("input[name=CurrentDip]").val());
+            var destinationDepth = !isNaN(parseFloat($("input[name=DestinationDepthTo]").val())) ? parseFloat($("input[name=DestinationDepthTo]").val()) : parseFloat($("input[name=DestinationDepthFrom]").val());
+            var currentPure = !isNaN(parseFloat(toContainer["pureVolume"])) ? parseFloat(toContainer["pureVolume"]) : 0;
+            var currentBulk = !isNaN(parseFloat(toContainer["fillVolume"])) ? parseFloat(toContainer["fillVolume"]) : 0;
+            strength = !isNaN(strength) ? parseFloat(strength) : 0;
+            volume = !isNaN(parseFloat(volume)) ? parseFloat(volume) : 0;
+            density = !isNaN(parseFloat(density)) ? parseFloat(density) : 0;
+            var addedPureVolume = (((parseFloat(toContainer["fillVolume"]) + volume) * strength) / 100) - parseFloat(toContainer["pureVolume"]);
+
+            addedPureVolume = !isNaN(parseFloat(addedPureVolume)) ? parseFloat(addedPureVolume) : 0;
+            currentPure = !isNaN(parseFloat(currentPure)) ? parseFloat(currentPure) : 0;
+            currentBulk = !isNaN(parseFloat(currentBulk)) ? parseFloat(currentBulk) : 0;
+            var totalPure = !isNaN(parseFloat(currentPure.toFixed + addedPureVolume)) ? parseFloat(currentPure.toFixed + addedPureVolume) : 0;
+
+            $("input[name=NewDestinationBulk]").val((currentBulk + volume).toFixed(1));
+            $("input[name=NewDestinationPure]").val((currentPure + addedPureVolume).toFixed(1));
+            $("input[name=DestinationBulkVolume]").val(volume.toFixed(1));
+            $("input[name=DestinationPureVolume]").val(addedPureVolume.toFixed(1));
+            $("input[name=DestinationBulkVolume]").val(volume.toFixed(1));
+
+            updateWastage();
+            updateContainerImages(0, sourceDepth, 0, destinationDepth);
+        });
+
+
+            function updateContainerImages(fromPercentage1, fromPercentage2, toPercentage1, toPercentage2) {
+
+                if (Container != null) {
+
+                    var containerView = $("#" + "liquid-percentage-from");
+                    var progressBar = containerView.find(".progress");
+                    var greenbar = progressBar.find(".progress-bar-one");
+                    var blackbar = progressBar.find(".progress-bar-two");
+                    var barOneWidth = "width:" + fromPercentage1 + "%";
+                    var barTwoWidth = "width:" + fromPercentage2 + "%;" + "background-color:black";
+
+                    greenbar.attr("style", barOneWidth);
+                    blackbar.attr("style", barTwoWidth);
+                }
+
+                if (toContainer != null) {
+
+                    var containerView = $("#" + "liquid-percentage-to");
+                    var progressBar = containerView.find(".progress");
+                    var greenbar = progressBar.find(".progress-bar-one");
+                    var blackbar = progressBar.find(".progress-bar-two");
+                    var barOneWidth = "width:" + toPercentage1 + "%";
+                    var barTwoWidth = "width:" + toPercentage2 + "%;" + "background-color:yellow";
+
+                    greenbar.attr("style", barOneWidth);
+                    blackbar.attr("style", barTwoWidth);
+                }
+
+                updateWastage();
+            }
+
+            function UpdateVatAnimation(viewId, fromPercentage1, fromPercentage2, containerObj) {
+                var containerView = $("#" + viewId);
+                var progressBar = containerView.find(".progress");
+                var greenbar = progressBar.find(".progress-bar-one");
+                var blackbar = progressBar.find(".progress-bar-two");
+                var barOneWidth = "width:" + fromPercentage1 + "%";
+                var barTwoWidth = "width:" + fromPercentage2 + "%;" + "background-color:black";
+                greenbar.attr("style", barOneWidth);
+                blackbar.attr("style", barTwoWidth);
+
+            }
+
+            var d = new Date();
+            d.setFullYear(d.getFullYear() - 100);
+            $('.datepicker').pickadate({
+                // Escape any “rule” characters with an exclamation mark (!).
+                format: 'yyyy-mm-dd',
+                selectYears: d,
+                max: new Date(),
+                selectMonths: true, // Creates a dropdown to control month
+                selectYears: 15 // Creates a dropdown of 15 years to control year
+            });
+
+            var $input = $('.datepicker').pickadate()
+            var picker = $input.pickadate('picker');
+            picker.set('disable', true)
+
+            $('select').each(function () {
+                $(this).material_select();
+                $(this).siblings("span").html("");
+            });
+
+            $('select').addClass("hidden");
+
+            $("#transferButton").on('click', function () {
+                var error = "";
+                var data = {};
+                data = getFormValues("source-transfer-form");
+                error = $("select[name=Container]").val() == "0" ? error + '<div class="alert alert-danger col-md-12">Please select a source.</div>' : error;
+                error = $("select[name=LiquidTypeId]").val() == "0" ? error + '<div class="alert alert-danger col-md-12">Please select liquid type.</div>' : error;
+                error = parseFloat($("input[name=Weight]").val()) > 0 || data["Id"].indexOf("CAR")==0 ? error : error + '<div class="alert alert-danger col-md-12">Please enter valid values as Mass(kg).</div>'
+                //error = parseFloat($("input[name=Temperature]").val()) > 0 || data["Id"].indexOf("CAR") == 0 ? error : error + '<div class="alert alert-danger col-md-12">Please enter a valid as Temperature.</div>';
+                error = (parseFloat($("input[name=Density]").val())) > 0 || data["Id"].indexOf("CAR") == 0 ? error : error + '<div class="alert alert-danger col-md-12">Please enter a valid as Density.</div>';
+
+                if (error != "") {
+                    showModalMessage("Error", error);
+                    return false;
+                }
+
+                // destroy and reinitiate
+                var transferSources = transfersTable.rows().data(); // row data of the table
+                data["ContainerName"] = Container["containerName"];
+                data["LiquidName"] = getLiquidType(data["LiquidTypeId"])["liquidName"];
+
+                var tableIndexColumn = "Container";
+
+                var i = 0; // for iteration
+                for (var transferSource in transferSources) {
+                    // transferSources has unwanted objects, we are skipping them using length attribute limit
+                    if (i < transferSources.length) {
+                        // if table already has the transferSource, remove it.
+                        if (transferSources["" + i + ""]["" + tableIndexColumn + ""] == data["" + tableIndexColumn + ""]) {
+
+                            // get the index
+                            var index = transfersTable.row(transferSource).index();
+                            var index = parseInt(index);
+
+                            transfersTable.row(index).remove();
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                    i++;
+                }
+
+                // add transferSource to the row
+                transfersTable.row.add(data).draw(false);
+                updateWastage();
+
+                showModalMessage("Scheduled", "Transfer source has been added for processing.");
+                // go through all contianers in vat table and place all of em in to container list and reinitiate it selecting 0
+                var transfers = getTableData(transfersTable);
+                var options = '<option value="0" > Recieving Vat</option>';
+
+                for (var containerIndex in containers) {
+                    var container = containers[containerIndex];
+                    var skip = false;
+                    for (var transferIndex in transfers) {
+                        var transfer = transfers[transferIndex];
+                        if (transfer["Container"] == container[0]) {
+                            skip = true;
+                            continue;
+                        }
+                    }
+                    options = skip ? options : options +'<option value=\"' + container[0] + '\" >' + container[2] + "</option>";
+                }
+                $("select[name=ToContainer]").html(options);
+                MaterialSelectReinitiate("select[name=ToContainer]", 0);
+                $("#destination-transfer-form input[type=submit]").removeClass("btn-default disabled");
+                $("#destination-transfer-form input[type=submit]").addClass("btn-primary");
+            
+            });
+
+            function UpdateDestinationForm(originalField) {
+                var destinationTransfer = getFormValues("destination-transfer-form");
+                // set production information
+                var volume = !isNaN(parseFloat(destinationTransfer["DestinationBulkVolume"])) ? parseFloat(destinationTransfer["DestinationBulkVolume"]) : 0;
+                var density = !isNaN(parseFloat(destinationTransfer["DestinationDensity"])) ? parseFloat(destinationTransfer["DestinationDensity"]) : 0;
+                var strength = getStrength(destinationTransfer["DestinationDensity"], destinationTransfer["DestinationTemperature"]);
+                var weight = !isNaN(parseFloat(destinationTransfer["DestinationWeight"])) ? parseFloat(destinationTransfer["DestinationWeight"]) : 0;;
+                var currentPure = !isNaN(parseFloat(toContainer["pureVolume"])) ? parseFloat(toContainer["pureVolume"]) : 0;
+                var currentWeight = !isNaN(parseFloat(toContainer["fillWeight"])) ? parseFloat(toContainer["fillWeight"]) : 0;
+                var currentBulk = !isNaN(parseFloat(toContainer["fillVolume"])) ? parseFloat(toContainer["fillVolume"]) : 0;
+                var capacityWeight = !isNaN(parseFloat(toContainer["capacityWeight"])) ? parseFloat(toContainer["capacityWeight"]) : 0;
+                //set new status information
+
+                addedPureVolume = 0;
+                strength = !isNaN(parseFloat(strength)) ? parseFloat(strength) : 0;
+
+                switch (originalField) {
+                    case "DestinationWeight":
+                        UpdateVatAnimation("liquid-percentage-to", ((currentWeight - weight) / capacityWeight) * 100, (weight / capacityWeight) * 100, toContainer);
+                        break;
+                    case "DestinationBulkVolume":
+                        weight = parseFloat(volume * density / 1000).toFixed(0)
+                        UpdateVatAnimation("liquid-percentage-to", ((currentWeight - weight) / capacityWeight) * 100, (weight / capacityWeight) * 100, toContainer);
+                        break;
+                }
+                volume = parseFloat((weight / density) * 1000).toFixed(1)
+                addedPureVolume = parseFloat((volume * strength)/100).toFixed(1);
+                currentWeight += parseFloat(weight);
+                currentBulk += parseFloat(volume);
+                currentPure = parseFloat((currentBulk * strength) / 100).toFixed(1);
+
+                $("#destination-transfer-form input[name=DestinationStrength]").val(strength);
+                $("#destination-transfer-form input[name=DestinationWeight]").val(weight);
+                $("#destination-transfer-form input[name=DestinationBulkVolume]").val(volume);
+                $("#destination-transfer-form input[name=DestinationPureVolume]").val(addedPureVolume);
+                $("#destination-transfer-form input[name=NewDestinationBulk]").val(currentBulk);
+                $("#destination-transfer-form input[name=NewDestinationPure]").val(currentPure);
+                $("#destination-transfer-form input[name=NewMass]").val(currentWeight);
+                updateWastage();
+            }
+
+            function UpdateSourceForm(originalField) {
+                // set production information
+                var sourceTransfer = getFormValues("source-transfer-form");
+                var volume = sourceTransfer["BulkVolume"] != "" ? parseFloat(sourceTransfer["BulkVolume"]) : 0;
+                var density = sourceTransfer["Density"] != '' ? parseFloat(sourceTransfer["Density"]) : 0;
+                var weight = sourceTransfer["Weight"] != "" ? parseFloat(sourceTransfer["Weight"]) : 0;;
+                var currentPure = !isNaN(parseFloat(Container["pureVolume"])) ? parseFloat(Container["pureVolume"]) : 0;
+                var currentWeight = !isNaN(parseFloat(Container["fillWeight"])) ? parseFloat(Container["fillWeight"]) : 0;
+                var currentBulk = !isNaN(parseFloat(Container["fillVolume"])) ? parseFloat(Container["fillVolume"]) : 0;
+                var capacityWeight = !isNaN(parseFloat(Container["capacityWeight"])) ? parseFloat(Container["capacityWeight"]) : 0;
+                var strength = null;
+
+                //set new status information
+                addedPureVolume = 0;
+
+                // set the strength
+                switch (originalField) {
+                    case "Weight":
+                        weight = weight;
+                        UpdateVatAnimation("liquid-percentage-from", ((currentWeight - weight) / capacityWeight) * 100, (weight / capacityWeight) * 100, toContainer);
+                        strength = getStrength(sourceTransfer["Density"], sourceTransfer["Temperature"]);
+                        $("#source-transfer-form input[name=Strength]").val(strength);
+                        break;
+                    case "BulkVolume":
+                        switch (Container["containerType"]) {
+                            case "EX":
+                                weight = parseFloat(((volume * density) / 1000).toFixed(1));
+                                break;
+                            default:
+                                weight = parseFloat(((volume * density) / 1000).toFixed(0));
+                                break;
+                        }
+                        UpdateVatAnimation("liquid-percentage-from", ((currentWeight - weight) / capacityWeight) * 100, (weight / capacityWeight) * 100, toContainer);
+                        strength = getStrength(sourceTransfer["Density"], sourceTransfer["Temperature"]);
+                        $("#source-transfer-form input[name=Strength]").val(strength);
+                        break;
+                    case "Strength":
+                        var temperature = getTemperature($("input[name=Density]").val(), $("input[name=Strength]").val());
+                        strength = $("input[name=Strength]").val();
+                        $("input[name=Temperature]").val(temperature);
+                        break;
+                    default:
+                        strength = getStrength(sourceTransfer["Density"], sourceTransfer["Temperature"]);
+                        strength = !isNaN(parseFloat(strength)) ? parseFloat(strength) : 0;
+                        $("#source-transfer-form input[name=Strength]").val(strength);
+                        break;
+                }
+
+                strength = !isNaN(parseFloat(strength)) ? parseFloat(strength) : 0;
+                sourceTransfer = getFormValues("source-transfer-form");
+                volume = parseFloat(weight * parseFloat(1000 / density)).toFixed(1);
+                addedPureVolume = parseFloat(((volume * strength) / 100).toFixed(1));
+                currentBulk -= volume;
+                currentWeight -= weight;
+                currentPure -= addedPureVolume;
+
+                $("#source-transfer-form input[name=Weight]").val(weight);
+                $("#source-transfer-form input[name=BulkVolume]").val(volume);
+                $("#source-transfer-form input[name=PureVolume]").val(addedPureVolume);
+                updateWastage();
+            }
+
+            $(".navigation-help").html("Processing / @Model.View.Title");
+    </script>
+}

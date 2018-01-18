@@ -1,0 +1,393 @@
+﻿@using ProductionControllSystem.Areas.Processing.Models;
+@using ClassLibrary.DatabaseModels;
+
+@model  BlendViewModel
+@{
+    ViewBag.Title = "Blend";
+}
+
+<title>@ViewBag.title</title>
+<h5>@ViewBag.title</h5>
+
+<ul class="nav nav-tabs" style="margin-bottom: 15px;">
+    <li class="active"><a href="#transfer" data-toggle="tab">Transfer</a></li>
+    <li><a href="#container" data-toggle="tab">Containers</a></li>
+</ul>
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="transfer">
+        <form action="no-implementation" id="liquidTransfer-form" method="POST">
+            <div class="panel sub-content-panel col-md-6 pull-left">
+                <div class="col-md-12">
+                    <table id="containers-table" class="display table table-hover table-striped" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Liquid Type</th>
+                                <th>Bulk (l)</th>
+                                <th>Pure (l)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (LiquidTransfer transfer in Model.Transfers)
+                            {
+                                if (transfer.Id != "0")
+                                {
+                                    <tr>
+                                        <td>
+                                            @transfer.FromContainer
+                                        </td>
+                                        <td>
+                                            @transfer.ToContainer
+                                        </td>
+                                        <td>
+                                            @if (Model.LiquidTypeId.Find(l => l.LiquidTypeId == transfer.LiquidType) != null)
+                                            {
+                                                <span>@Model.LiquidTypeId.Find(l => l.LiquidTypeId == transfer.LiquidType).LiquidName</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Unknown</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @transfer.SourceBulkVolume
+                                        </td>
+                                        <td>
+                                            @transfer.SourcePureVolume
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table> 
+                </div>
+                <div class="col-md-12" id="liquid-percentage-from">
+                    <div class="col-md-6 vat_div">
+                        <div class="progress vertical-sibling">
+                            <div class="progress-bar progress-bar-one progress-bar-striped " role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+                            <div class="progress-bar progress-bar-two progress-bar-striped " role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width: 0%;background-color:black"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                    </div>
+                </div>
+
+                
+            </div>
+
+            <div class="panel sub-content-panel col-md-5 pull-right">
+
+            </div>
+
+            <div class="panel sub-content-panel col-md-5 pull-right">
+
+                <div class="col-md-12">
+                    <div id="name-group" class="form-group col-md-12">
+                        <div class="col-md-12">
+                            <label for="name" class="custom-label">Wastage</label>
+                        </div>
+                        <div class="col-md-12">
+                @*            @Html.TextBoxFor(m => m.Wastage, new { @class = "form-control", required = "true", type = "text" })*@
+                        </div>
+                    </div>
+                    <div id="name-group" class="form-group col-md-12">
+                        <div class="col-md-8">
+                            <label for="name" class="custom-label">Liquid Type</label>
+                        </div>
+                        @*<div class="col-md-4">
+                            @Html.DropDownListFor(m => m.LiquidTypeId,
+                                  new SelectList(Model.LiquidTypeId,
+                               "LiquidTypeId", "LiquidName",
+                                        Model.LiquidTypeId.First().LiquidTypeId), new { @class = "form-control disabled", tabindex = "-1" , id = "LiquidTypeId", name = "LiquidName" })
+                            }
+                        </div>*@
+                    </div>
+                    <div class="hidden">
+                        @Html.TextBoxFor(m => m.CreatedUser, new { @class = "form-control hidden", required = "true", type = "text" })
+                        @*@Html.TextBoxFor(m => m.TransferType, new { @class = "form-control hidden", required = "true", type = "text" })*@
+                        @Html.TextBoxFor(m => m.LocationId, new { @class = "form-control hidden", required = "true", type = "text" })
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+
+                    <div id="name-group" class="form-group col-md-12">
+                        <label for="name" class="custom-label">Blend time</label>
+                        <span class="input-group-addon custom-datepicker form-control">
+                            <span class="glyphicon glyphicon-calendar date-icon"></span>
+                          @*  @Html.TextBoxFor(m => m.TransferTime, new { @class = "datepicker form-control custom-text-box", required = "true", type = "text" })*@
+                        </span>
+                    </div>
+                    <div id="name-group" class="form-group col-md-12">
+                        <input type="submit" class="btn btn-primary btn-raised" value="Blend" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="tab-pane fade" id="container">
+        <div class="col-md-12 panel sub-content-panel pull-right">
+            <h5>Containers</h5>
+        </div>
+    </div>
+</div>
+
+@section script
+    {
+    <script>
+        var fromContainer = null;
+        var toContainer = null;
+
+        function updateWastage() {
+            var wastage = parseFloat($("input[name=DestinationBulkVolume]").val()) - parseFloat($("input[name=SourceBulkVolume]").val());
+            $("input[name=Wastage]").val(wastage.toFixed(1));
+        }
+
+        var receiversTable = initiateTable1_1("containers-table",
+                    {
+                        "sDom": "t",
+                        "bLengthChange": false
+                    }
+                , function () { }, function () { });
+
+        var d = new Date();
+        d.setFullYear(d.getFullYear() - 100);
+        $('.datepicker').pickadate({
+            // Escape any “rule” characters with an exclamation mark (!).
+            format: 'yyyy-mm-dd',
+            selectYears: d,
+            max: new Date(),
+            selectMonths: true, // Creates a dropdown to control month
+            selectYears: 15 // Creates a dropdown of 15 years to control year
+        });
+
+        $("select[name=FromContainer]").change(function () {
+            if ($(this).val() == "0") {
+
+                $("#liquid-percentage-from").removeAttr("style");
+
+                MaterialSelectReinitiate("select[name='LiquidTypeId']", 0)
+                
+                $("input[name=SourceDepthTo]").attr("min", pareFloat(fromContainer["currentDepth"])+1);
+                $("input[name=SourceDepthTo]").val(fromContainer["currentDepth"]);
+                $("input[name='SourceDepthFrom']").val(fromContainer["currentDepth"]);
+                $("input[name='SourceDensity']").val("");
+                $("input[name='SourceTemperature']").val("");
+                $("input[name='SourceStrength']").val("");
+                $("input[name='SourceBulkVolume']").val("");
+                $("input[name='SourcePureVolume']").val("");
+                $("input[name='Wastage']").val("");
+
+                updateContainerImages(parseFloat($("input[name=SourceDepthTo]").val()), 0);
+
+                
+                return;
+            }
+            $.ajax({
+                type: 'get',
+                url: "../../api/Container/Get?containerId=" + $(this).val(),
+                dataType: 'json',
+                async: true,
+                contentType: 'application/json',
+                success: function (response) {
+                    fromContainer = response;
+
+                    var capacity = parseFloat((typeof response["capacity"] != 'undefined' && response["capacity"] != "") ? response["capacity"] : "0");
+                    var density = parseFloat((typeof response["density"] != 'undefined' && response["density"] != "") ? response["density"] : "0");
+                    var temperature = parseFloat((typeof response["temperature"] != 'undefined' && response["temperature"] != "") ? response["temperature"] : "0");
+                    var strength = parseFloat((typeof response["strength"] != 'undefined' && response["strength"] != "") ? response["strength"] : "0");
+
+                    var volume = parseFloat((typeof response["fillVolume"] != 'undefined' && response["fillVolume"] != "") ? response["fillVolume"] : "0");
+                    var pureVolume = parseFloat((typeof response["pureVolume"] != 'undefined' && response["pureVolume"] != "") ? response["pureVolume"] : "0");
+
+                    var SourceWeight = density * volume;
+                    var SourceWeightToAdd = parseFloat($("input[name=SourceWeight]").val() != "" ? $("input[name=SourceWeight]").val() : "0");
+                    // set container current SourceWeight
+
+                    $("#liquid-percentage-from").attr("style", "width : " + ((SourceWeight + SourceWeightToAdd) / capacity) * 100 + "%;");
+
+                    MaterialSelectReinitiate("select[name='LiquidTypeId']", response["liquidTypeId"]);
+                    $("input[name='SourceDepthFrom']").val(response["currentDepth"]);
+                    $("input[name='SourceDepthTo']").val("");
+                    $("input[name='SourceBulkVolume']").val("");
+                    $("input[name='SourcePureVolume']").val("");
+                    $("input[name='SourceDensity']").val(density);
+                    $("input[name='SourceTemperature']").val(temperature);
+                    $("input[name='SourceStrength']").val(strength);
+
+                    $("input[name='SourceDepthTo']").attr("min", 0);
+
+                    $("input[name='SourceDepthTo']").attr("max", response["currentDepth"]);
+
+                    updateContainerImages(parseFloat($("input[name=SourceDepthFrom]").val()), parseFloat($("input[name=DestinationDepthTo]").val()));
+                },
+                error: function (response) {
+                    console.log("failure" + response);
+                }
+            });
+        });
+
+        $("select[name=ToContainer]").change(function () {
+            if ($(this).val() == "0") {
+                if ($(this).val() == "0") {
+
+                    $("#liquid-percentage-from").removeAttr("style");
+
+                    MaterialSelectReinitiate("select[name='LiquidTypeId']", 0)
+                    toContainer["currentDepth"] = 0;
+                    $("input[name='DestinationDepthFrom']").val("");
+                    $("input[name='DestinationDepthTo']").val("");
+                    $("input[name='DestinationDensity']").val("");
+                    $("input[name='DestinationTemperature']").val("");
+                    $("input[name='DestinationStrength']").val("");
+                    $("input[name='DestinationBulkVolume']").val("");
+                    return;
+                }
+                return;
+            }
+            $.ajax({
+                type: 'get',
+                url: "../../api/Container/Get?containerId=" + $(this).val(),
+                dataType: 'json',
+                async: false,
+                contentType: 'application/json',
+                success: function (response) {
+                    toContainer = response;
+                    console.log(response);
+                    if (parseFloat(response["currentDepth"]) > 0 && response["liquidTypeId"] != $("select[name='LiquidTypeId']").val()) {
+                        MaterialSelectReinitiate("select[name='ToContainer']", 0);
+
+
+                        $("#liquid-percentage-from").removeAttr("style");
+
+                        MaterialSelectReinitiate("select[name='LiquidTypeId']", 0)
+                        toContainer["currentDepth"] = 0;
+                        $("input[name='DestinationDepthFrom']").val("0");
+                        $("input[name='DestinationDepthTo']").val("0");
+                        $("input[name='DestinationDensity']").val("0");
+                        $("input[name='DestinationTemperature']").val("0");
+                        $("input[name='DestinationStrength']").val("0");
+                        $("input[name='DestinationBulkVolume']").val("0");
+                        updateContainerImages(parseFloat($("input[name=SourceDepthTo]").val()), parseFloat($("input[name=DestinationDepthTo]").val()));
+                        return;
+                    }
+
+                    var capacity = parseFloat((typeof response["capacity"] != 'undefined' && response["capacity"] != "") ? response["capacity"] : "0");
+                    var density = parseFloat((typeof response["density"] != 'undefined' && response["density"] != "") ? response["density"] : "0") / 1000;
+                    var volume = parseFloat((typeof response["volumeLitres"] != 'undefined' && response["volumeLitres"] != "") ? response["volumeLitres"] : "0");
+                    var SourceWeight = density * volume;
+                    var SourceWeightToAdd = parseFloat($("input[name=SourceWeight]").val() != "" ? $("input[name=SourceWeight]").val() : "0");
+                    
+                    $("input[name='DestinationDepthFrom']").val(response["currentDepth"]);
+                    $("input[name='DestinationDepthTo']").val(response["currentDepth"]);
+
+                    $("input[name='DestinationDepthTo']").attr("min", response["currentDepth"]);
+
+                    $("input[name='DestinationDepthTo']").attr("max", response["maxDepth"]);
+
+                },
+                error: function (response) {
+                    console.log("failure" + response);
+                }
+            });
+        });
+
+        $('input[name=SourceDensity]').change(function () {
+            if ($('input[name=SourceTemperature]').val() != '') {
+                var strength = getStrength($(this).val(), $('input[name=SourceTemperature]').val());
+                var volume = $("input[name=SourceBulkVolume]").val() != "" ? parseFloat($("input[name=SourceBulkVolume]").val()) : 0;
+                var density = parseFloat($(this).val());
+                strength = !isNaN(parseFloat(strength)) ? parseFloat(strength) : 0;
+                volume = !isNaN(parseFloat(volume)) ? parseFloat(volume) : 0;
+                density = !isNaN(parseFloat(density)) ? parseFloat(density) : 0;
+
+                $("input[name=SourceStrength]").val(strength.toFixed(1));
+                $("input[name=SourcePureVolume]").val(parseFloat((volume * strength) / 100).toFixed(1));
+                $("input[name=SourceWeight]").val(parseFloat((volume * density) / 1000).toFixed(1));
+            } else {
+                $("input[name=SourceStrength]").val('');
+
+            }
+            updateWastage();
+        });
+
+        $('input[name=SourceTemperature]').change(function () {
+            if ($('input[name=SourceDensity]').val() != '') {
+                var volume = $("input[name=SourceBulkVolume]").val() != "" ? parseFloat($("input[name=SourceBulkVolume]").val()) : 0;
+                var density = $('input[name=SourceDensity]').val() != '' ? parseFloat($('input[name=SourceDensity]').val()) : 0;
+
+                var strength = getStrength($('input[name=SourceDensity]').val(), $(this).val());
+                strength = !isNaN(parseFloat(strength)) ? parseFloat(strength) : 0;
+                
+                $("input[name=SourcePureVolume]").val(parseFloat((volume * strength) / 100).toFixed(1));
+                $("input[name=SourceStrength]").val(strength.toFixed(1));
+                $("input[name=SourceWeight]").val(parseFloat((volume * density) / 1000).toFixed(1));
+            } else {
+                $("input[name=SourceStrength]").val('');
+                $("input[name=SourceWeight]").val('');
+            }
+            updateWastage();
+        });
+
+        $("input[name='SourceDepthTo']").change(function () {
+            var strength = parseFloat($("#input[name='SourceStrength']").val() != "" || $("input[name='SourceStrength']").val() != "Error" ? parseFloat($("input[name='SourceStrength']").val()) : 0);
+            var density = parseFloat($("input[name='SourceDensity']").val());
+            var containerId = $("select[name='FromContainer']").val() != "" ? parseFloat($("select[name='FromContainer']").val()) : 0;
+            var containerFromDepth = $("input[name='SourceDepthFrom']").val() != "" ? parseFloat($("input[name='SourceDepthFrom']").val()) : 0;
+            var containerToDepth = $(this).val() != "" ? parseFloat($(this).val()) : 0;
+            var volume = parseFloat(getVolume(containerId, containerFromDepth, containerToDepth));
+            var reading1 = parseFloat(getVolume(containerId, 0, containerToDepth));
+            var reading2 = parseFloat(getVolume(containerId, 0, containerFromDepth));
+
+            reading1 = !isNaN(reading1) ? parseFloat(reading1) : 0;
+            strength = !isNaN(strength) ? parseFloat(strength) : 0;
+            reading2 = !isNaN(reading2) ? parseFloat(reading2) : 0;
+            var pureVolume = parseFloat(((volume.toFixed(1) * strength.toFixed(1)) / 100).toFixed(1));
+            $("input[name=SourcePureVolume]").val(pureVolume);
+            $("input[name='SourceBulkVolume']").val(volume.toFixed(1));
+
+            var pureReading1 = ((strength.toFixed(1) * reading1 )/100).toFixed(1);
+            var pureReading2 = ((strength.toFixed(1) * reading2 )/100).toFixed(1);
+            var wastage =  parseFloat(pureVolume.toFixed(1) - (pureReading2 - pureReading1).toFixed(1));
+            console.log("wastage :" + wastage.toFixed(1));
+            console.log("reading1 :" + reading1);
+            console.log("reading2 :" + reading2);
+            console.log("pure reading1 :" + pureReading1);
+            console.log("pure reading2 :" + pureReading2);
+            console.log("issue bulk:" + volume.toFixed(1));
+            console.log("issue pure:" + (pureReading2 - pureReading1).toFixed(1));
+            console.log("pure :" + pureVolume);
+
+            $("input[name='Wastage']").val(wastage.toFixed(1));
+            
+            updateContainerImages(parseFloat($("input[name='SourceDepthTo']").val()), parseFloat($("input[name='DestinationDepthTo']").val()));
+        });
+
+        function updateContainerImages(fromContainerToDepth, toContainerToDepth) {
+
+            if (fromContainer != null) {
+
+                var containerView = $("#" + "liquid-percentage-from");
+                var progressBar = containerView.find(".progress");
+                var greenbar = progressBar.find(".progress-bar-one");
+                var blackbar = progressBar.find(".progress-bar-two");
+                
+                var barOneWidth = "width:" + ((fromContainerToDepth / parseFloat(fromContainer["maxDepth"])) * 100).toFixed(1) + "%";
+                var barTwoWidth = "width:" + ((((fromContainer["currentDepth"] - fromContainerToDepth)) / parseFloat(fromContainer["maxDepth"])) * 100).toFixed(1) + "%;" + "background-color:black";
+                greenbar.attr("style", barOneWidth);
+                blackbar.attr("style", barTwoWidth);
+            }
+            //updateWastage();
+        }
+
+        $('select').each(function () {
+            $(this).material_select();
+            $(this).siblings("span").html("");
+        });
+        $('select').addClass("hidden");
+
+        $(".navigation-help").html("Vats / Transfer Liquid");
+    </script>
+}

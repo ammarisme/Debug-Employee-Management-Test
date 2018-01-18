@@ -1,0 +1,71 @@
+E:\Projects\DCSL\SalesForceAutomation\SFALibrary\bin\Debug\SFALibrary.dll
+E:\Projects\DCSL\SalesForceAutomation\SFALibrary\bin\Debug\SFALibrary.pdb
+E:\Projects\DCSL\SalesForceAutomation\SFALibrary\obj\Debug\SFALibrary.dll
+E:\Projects\DCSL\SalesForceAutomation\SFALibrary\obj\Debug\SFALibrary.pdb
+E:\Projects\DCSL\SalesForceAutomation\SFALibrary\bin\Debug\SFALibrary.dll.config
+D:\Projects\DCSL\SalesForceAutomation\SFALibrary\bin\Debug\SFALibrary.dll.config
+D:\Projects\DCSL\SalesForceAutomation\SFALibrary\bin\Debug\SFALibrary.dll
+D:\Projects\DCSL\SalesForceAutomation\SFALibrary\bin\Debug\SFALibrary.pdb
+D:\Projects\DCSL\SalesForceAutomation\SFALibrary\obj\Debug\SFALibrary.dll
+D:\Projects\DCSL\SalesForceAutomation\SFALibrary\obj\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\SCAD - Copy\SFALibrary\bin\Debug\SFALibrary.dll.config
+C:\Users\Admin\Desktop\SCAD - Copy\SFALibrary\bin\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\SCAD - Copy\SFALibrary\bin\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\SCAD - Copy\SFALibrary\obj\Debug\SFA_Library.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\SCAD - Copy\SFALibrary\obj\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\SCAD - Copy\SFALibrary\obj\Debug\SFALibrary.pdb
+D:\Projects\DCSL\SalesForceAutomation\SFALibrary\obj\Debug\SFA_Library.csprojResolveAssemblyReference.cache
+D:\Projects\SCAD\SFALibrary\bin\Debug\SFALibrary.dll.config
+D:\Projects\SCAD\SFALibrary\bin\Debug\SFALibrary.dll
+D:\Projects\SCAD\SFALibrary\bin\Debug\SFALibrary.pdb
+D:\Projects\SCAD\SFALibrary\obj\Debug\ResolveAssemblyReference.cache
+D:\Projects\SCAD\SFALibrary\obj\Debug\SFALibrary.dll
+D:\Projects\SCAD\SFALibrary\obj\Debug\SFALibrary.pdb
+D:\Projects\SCAD\SCAD\SFALibrary\bin\Debug\SFALibrary.dll.config
+D:\Projects\SCAD\SCAD\SFALibrary\bin\Debug\SFALibrary.dll
+D:\Projects\SCAD\SCAD\SFALibrary\bin\Debug\SFALibrary.pdb
+D:\Projects\SCAD\SCAD\SFALibrary\obj\Debug\ResolveAssemblyReference.cache
+D:\Projects\SCAD\SCAD\SFALibrary\obj\Debug\SFALibrary.dll
+D:\Projects\SCAD\SCAD\SFALibrary\obj\Debug\SFALibrary.pdb
+D:\Projects\SCAD\Way before ammars change\SFALibrary\bin\Debug\SFALibrary.dll.config
+D:\Projects\SCAD\Way before ammars change\SFALibrary\bin\Debug\SFALibrary.dll
+D:\Projects\SCAD\Way before ammars change\SFALibrary\bin\Debug\SFALibrary.pdb
+D:\Projects\SCAD\Way before ammars change\SFALibrary\obj\Debug\ResolveAssemblyReference.cache
+D:\Projects\SCAD\Way before ammars change\SFALibrary\obj\Debug\SFALibrary.dll
+D:\Projects\SCAD\Way before ammars change\SFALibrary\obj\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\bin\Debug\SFALibrary.dll.config
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\bin\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\bin\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\obj\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\obj\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\obj\Debug\SFA_Library.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\DCSL_MANUFACTURING\SFALibrary\obj\Debug\SFA_Library.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\DCSL_MANUFACTURING\SFALibrary\obj\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\DCSL_MANUFACTURING\SFALibrary\obj\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\DCSL_MANUFACTURING\SFALibrary\bin\Debug\SFALibrary.dll.config
+C:\Users\Admin\Desktop\DCSL_MANUFACTURING\SFALibrary\bin\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\DCSL_MANUFACTURING\SFALibrary\bin\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufactoring\SFALibrary\obj\Debug\SFA_Library.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\Manufactoring\SFALibrary\obj\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufactoring\SFALibrary\obj\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufactoring\SFALibrary\bin\Debug\SFALibrary.dll.config
+C:\Users\Admin\Desktop\Manufactoring\SFALibrary\bin\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufactoring\SFALibrary\bin\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing\SFALibrary\bin\Debug\SFALibrary.dll.config
+C:\Users\Admin\Desktop\Manufacturing\SFALibrary\bin\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing\SFALibrary\bin\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing\SFALibrary\obj\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing\SFALibrary\obj\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing\SFALibrary\obj\Debug\SFA_Library.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\Manufacturing_trunk\SFALibrary\obj\Debug\SFA_Library.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\Manufacturing_trunk\SFALibrary\obj\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing_trunk\SFALibrary\obj\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing_trunk\SFALibrary\bin\Debug\SFALibrary.dll.config
+C:\Users\Admin\Desktop\Manufacturing_trunk\SFALibrary\bin\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing_trunk\SFALibrary\bin\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\bin\Debug\SFALibrary.dll.config
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\bin\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\bin\Debug\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\obj\Debug\SFA_Library.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\obj\Debug\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\obj\Debug\SFALibrary.pdb

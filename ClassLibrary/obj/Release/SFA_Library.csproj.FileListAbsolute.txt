@@ -1,0 +1,12 @@
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\bin\Release\SFALibrary.dll.config
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\bin\Release\SFALibrary.dll
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\bin\Release\SFALibrary.pdb
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\obj\Release\SFA_Library.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\obj\Release\SFALibrary.dll
+C:\Users\Admin\Desktop\DCSL-SCAD-SS-trunk\SFALibrary\obj\Release\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\bin\Release\SFALibrary.dll.config
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\bin\Release\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\bin\Release\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\obj\Release\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\obj\Release\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFALibrary\obj\Release\SFA_Library.csprojResolveAssemblyReference.cache
