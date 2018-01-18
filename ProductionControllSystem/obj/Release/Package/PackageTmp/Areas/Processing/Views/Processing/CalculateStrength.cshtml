@@ -1,0 +1,144 @@
+﻿@using ProductionControllSystem.Areas.Processing.Models
+
+@model  CalculateStrengthViewModel
+@{
+    ViewBag.Title = "Container strength";
+
+}
+
+<title>@ViewBag.title</title>
+ <h5>@ViewBag.title</h5>
+
+<div class="panel sub-content-panel col-md-12">
+    <form action="no-implementation" id="calculation-form" method="POST">
+        @*public string Strength { get { return strength; }  set { strength= value.Trim(); } }
+        [DBField("LIQTY")]*@
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label" >Container : </label>
+            @Html.DropDownListFor(m => m.ContainerId,
+                                  new SelectList(Model.ContainerId,
+                               "Id", "ContainerName",
+                                        Model.ContainerId.First().Id), new { @class = "form-control custom-text-box", id = "ContainerId", name= "ContainerId"  , required="true" , min="1"})
+        </div>
+
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label">Liquid Type : </label>
+            @Html.DropDownListFor(m => m.LiquidType,
+                                  new SelectList(Model.LiquidType,
+                               "LiquidType", "LiquidName",
+                                        Model.LiquidType.First().LiquidType), new { @class = "form-control disabled", id = "LiquidType", name = "LiquidName"  , tabIndex="-1" , required = "true", min = "1" })
+        </div>
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label">Density (kg/m<sup>3</sup>)</label>
+            @Html.TextBoxFor(m => m.Density, new { @class = "form-control custom-text-box", required = "true", type = "number", step="0.1" , min = "1" })
+        </div>
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label">Temperature (C)</label>
+            @Html.TextBoxFor(m => m.Temperature, new { @class = "form-control custom-text-box", required = "true", type = "number", step = "0.5", min = "1" })
+        </div>
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label">Strength : </label>
+            @Html.TextBoxFor(m => m.Strength, new { @class = "form-control disabled custom-text-box", required = "true", type = "number", step = "0.01", tabIndex="-1"})
+        </div>
+        <div id="name-group" class="form-group col-md-4">
+            <label for="name" class="custom-label">Date: </label>
+            <span class="input-group-addon custom-datepicker form-control">
+                <span class="glyphicon glyphicon-calendar date-icon"></span>
+                @Html.TextBoxFor(m => m.CalculationTime, new { @class = "datepicker form-control custom-text-box", required = "true", type = "text" })
+            </span>
+        </div>
+        <input  name="CreatedUser" class="hidden" value="@Session["UserId"]" />
+
+        
+        <input type="submit" class="btn btn-primary btn-raised" value="Save Strength" />
+    </form>
+</div>
+
+@section script
+    {
+    <script>
+        $("#calculation-form").on('submit', function (event) {
+            var error = "";
+            error = $("input[name=Strength]").val() == "0" ? error + "</br>Please enter temperature and density." : error;
+            error = $("input[name=CalculationTime]").val() == "" ? error + "</br>Please enter date." : error;
+
+            if (error != "") {
+                showModalMessage("Error", error);
+            } else {
+                var data = getFormValues("calculation-form");
+                sendObjectToServer("../../api/ContainerCalculations/SaveStrength", data,
+                   function () {
+                       showModalMessage("Calculations added", "Please check reports for calculation history");
+                   }, function (data) {
+                       showModalMessage("Error", "Please check your internet connection.");
+                   });
+            }
+            event.preventDefault();
+        });
+
+        $('input[name=Density]').change(function () {
+            if ($('input[name=Temperature]').val() != '') {
+                var strength = getStrength($(this).val(), $('input[name=Temperature]').val());
+                strength = strength != "Error" ? strength : "0";
+                $("input[name=Strength]").val(strength);
+
+            } else {
+                $("input[name=Strength]").val('');
+            }
+        });
+
+        $('input[name=Temperature]').change(function () {
+            if ($('input[name=Density]').val() != '') {
+                var strength = getStrength($('input[name=Density]').val(), $(this).val());
+                strength = strength != "Error" ? strength : "0";
+                $("input[name=Strength]").val(strength);
+            } else {
+                $("input[name=Strength]").val('');
+            }
+        });
+
+        $("select[name=ContainerId]").change(function () {
+            var density;
+            $.ajax({
+                type: 'get',
+                url: "../../api/Container/Get?containerId=" + $(this).val(),
+                dataType: 'json',
+                async: false,
+                contentType: 'application/json',
+                success: function (response) {
+                    var capacity = parseFloat((typeof response["capacity"] != 'undefined' && response["capacity"] != "") ? response["capacity"] : "0");
+                    var density = parseFloat((typeof response["density"] != 'undefined' && response["density"] != "") ? response["density"] : "0")/1000;
+                    var volume = parseFloat((typeof response["volumeLitres"] != 'undefined' && response["volumeLitres"] != "") ? response["volumeLitres"] : "0");
+                    var weight = volume * density;
+                    MaterialSelectReinitiate("select[name=LiquidType]", response["liquidTypeId"]);
+                    $("input[name=Strength]").val('');
+                    $("input[name=Density]").val('');
+                    $("input[name=Temperature]").val('');
+                },
+                error: function (response) {
+                    console.log("failure" + response);
+                }
+            });
+        });
+
+        var d = new Date();
+        d.setFullYear(d.getFullYear() - 100);
+        $('.datepicker').pickadate({
+            // Escape any “rule” characters with an exclamation mark (!).
+            format: 'yyyy-mm-dd',
+            selectYears: d,
+            max: new Date(),
+            selectMonths: true, // Creates a dropdown to control month
+            selectYears: 15 // Creates a dropdown of 15 years to control year
+        });
+
+
+        $('select').each(function () {
+            $(this).material_select();
+            $(this).siblings("span").html("");
+        });
+        $('select').addClass("hidden");
+
+        $(".navigation-help").html("Vats / Calculate Strength");
+    </script>
+}

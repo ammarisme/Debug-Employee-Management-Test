@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit http://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAAYcK/QvC8UWZ0V0ascUiMgAAAAACAAAAAAAQZgAAAAEAACAAAADrMB93qrzX7I9yPd7nfN8jziWn+PuBBzyZ1Zx3YstA/gAAAAAOgAAAAAIAACAAAAAe7ZRFDmZT9u7zdCp0fIHTz109kavFTN+giFKm4P3CSRAAAABJkx+FChqStuDHaX8vg+0lQAAAAJs5b/AupGg4WeMeqadKcxtBE3AM/7yfHN8g4spCAAWyEhw8oJpWw2oFw2Nykfl8oXgbsDB6FtqC0UEbjXLjG1A=</EncryptedPassword>
+    <_PublishTargetUrl>ftp://10.2.2.30:9027/DCSL_MNF_WCF</_PublishTargetUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="bin/DatabaseOperations.txt">
+      <publishTime>09/20/2017 11:01:19</publishTime>
+    </File>
+    <File Include="bin/SFALibrary.dll">
+      <publishTime>11/15/2017 15:30:22</publishTime>
+    </File>
+    <File Include="bin/SFA_WCF.dll">
+      <publishTime>11/17/2017 10:21:51</publishTime>
+    </File>
+    <File Include="DatabaseOperations.txt">
+      <publishTime>09/20/2017 11:01:19</publishTime>
+    </File>
+    <File Include="Service.svc">
+      <publishTime>06/30/2017 17:09:24</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>11/23/2017 09:47:00</publishTime>
+    </File>
+    <File Include="Web.Debug.config">
+      <publishTime>05/25/2017 09:13:08</publishTime>
+    </File>
+    <File Include="Web.Release.config">
+      <publishTime>05/25/2017 09:13:07</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

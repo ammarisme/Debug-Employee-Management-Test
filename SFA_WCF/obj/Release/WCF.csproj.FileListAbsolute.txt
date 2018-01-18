@@ -1,0 +1,33 @@
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFA_WCF\bin\SFA_WCF.dll.config
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFA_WCF\bin\SFA_WCF.dll
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFA_WCF\bin\SFA_WCF.pdb
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFA_WCF\bin\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFA_WCF\bin\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFA_WCF\obj\Release\WCF.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFA_WCF\obj\Release\SFA_WCF.dll
+C:\Users\Admin\Desktop\Manufacturing_trunk_2\SFA_WCF\obj\Release\SFA_WCF.pdb
+C:\Users\Admin\Desktop\Manufacturing\SFA_WCF\bin\SFA_WCF.dll.config
+C:\Users\Admin\Desktop\Manufacturing\SFA_WCF\bin\SFA_WCF.dll
+C:\Users\Admin\Desktop\Manufacturing\SFA_WCF\bin\SFA_WCF.pdb
+C:\Users\Admin\Desktop\Manufacturing\SFA_WCF\bin\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing\SFA_WCF\bin\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing\SFA_WCF\obj\Release\WCF.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\Manufacturing\SFA_WCF\obj\Release\SFA_WCF.dll
+C:\Users\Admin\Desktop\Manufacturing\SFA_WCF\obj\Release\SFA_WCF.pdb
+C:\Users\Admin\Desktop\Manufacturing\SFA_WCF\bin\DatabaseOperations.txt
+C:\Users\Admin\Desktop\Manufacturing_10_30\SFA_WCF\bin\SFA_WCF.dll.config
+C:\Users\Admin\Desktop\Manufacturing_10_30\SFA_WCF\bin\SFA_WCF.dll
+C:\Users\Admin\Desktop\Manufacturing_10_30\SFA_WCF\bin\SFA_WCF.pdb
+C:\Users\Admin\Desktop\Manufacturing_10_30\SFA_WCF\bin\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing_10_30\SFA_WCF\bin\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing_10_30\SFA_WCF\obj\Release\SFA_WCF.dll
+C:\Users\Admin\Desktop\Manufacturing_10_30\SFA_WCF\obj\Release\SFA_WCF.pdb
+C:\Users\Admin\Desktop\Manufacturing_10_30\SFA_WCF\obj\Release\WCF.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\Manufacturing Trunk\SFA_WCF\bin\SFA_WCF.dll.config
+C:\Users\Admin\Desktop\Manufacturing Trunk\SFA_WCF\bin\SFA_WCF.dll
+C:\Users\Admin\Desktop\Manufacturing Trunk\SFA_WCF\bin\SFA_WCF.pdb
+C:\Users\Admin\Desktop\Manufacturing Trunk\SFA_WCF\bin\SFALibrary.dll
+C:\Users\Admin\Desktop\Manufacturing Trunk\SFA_WCF\bin\SFALibrary.pdb
+C:\Users\Admin\Desktop\Manufacturing Trunk\SFA_WCF\obj\Release\WCF.csprojResolveAssemblyReference.cache
+C:\Users\Admin\Desktop\Manufacturing Trunk\SFA_WCF\obj\Release\SFA_WCF.dll
+C:\Users\Admin\Desktop\Manufacturing Trunk\SFA_WCF\obj\Release\SFA_WCF.pdb

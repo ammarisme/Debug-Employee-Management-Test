@@ -1,0 +1,105 @@
+﻿@using FrontEnd.Areas.Accounts.Models;
+@using ClassLibrary.Models;
+@model DashboardViewModel
+
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<title>@ViewBag.title</title>
+
+<div class="panel">
+    <ul class="nav nav-tabs" style="margin-bottom: 15px;">
+        <li class="active"><a href="#add" data-toggle="tab">Add</a></li>
+        <li><a href="#view" data-toggle="tab">View</a></li>
+    </ul>
+
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade active in" id="add">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <form action="/" method="post" id="employee-add-form">
+                        <div class="col-md-12">
+                            <div id="name-group" class="form-group col-md-3 form-group-custom">
+                                <label for="name" class="custom-label">Employee No : </label>
+                                @Html.TextBoxFor(m => m.EmployeeNo, new { @class = "form-control custom-text-box", required = "true", min = 1, type = "number", step = "0.01", autocomplete = "off" })
+                            </div>
+                            <div id="name-group" class="form-group col-md-3">
+                                <label for="name" class="custom-label">Employee Name :</label>
+                                @Html.TextBoxFor(m => m.EmployeeName, new { @class = "form-control custom-text-box", type = "text", autocomplete = "off" })
+                            </div>
+                            <div id="name-group" class="form-group col-md-3">
+                                <label for="name" class="custom-label">Email :</label>
+                                @Html.TextBoxFor(m => m.Email, new { @class = "form-control custom-text-box", type = "email" })
+                            </div>
+                            <div id="name-group" class="form-group col-md-3">
+                                <label for="name" class="custom-label">Department :</label>
+                                @Html.TextBoxFor(m => m.Department, new { @class = "form-control custom-text-box", type = "text", autocomplete = "off", tabindex = "-1" })
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div id="name-group" class="form-group col-md-3">
+                                <label for="name" class="custom-label">Contact No :</label>
+                                @Html.TextBoxFor(m => m.ContactNo, new { @class = "form-control custom-text-box", type = "text", autocomplete = "off" })
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div id="name-group" class="form-group col-md-3 pull-right">
+                                <button class="btn btn-primary pull-right" type="submit" style="color:white">Add</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                </div>
+            </div>
+        
+        <div class="tab-pane fade" id="view">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table>
+                                <thead>
+                                  <tr>
+                                      <td> Employee No</td>
+                                      <td> Employee Name</td>
+                                      <td> Department</td>
+                                      <td> Email</td>
+                                      <td></td>
+                                  </tr>
+                                </thead>
+                                @foreach (Employee emp in Model.employees)
+                                {<tr>
+                                <td>@emp.EmployeeNo</td>
+                                <td>@emp.EmployeeName</td>
+                                     <td>@emp.Department</td>
+                                     <td>@emp.Email</td>
+                                     <td><button class="btn btn-primary" style="color:white">View</button>
+                                         <button class="btn btn-default">Edit</button>
+                                         <button class="btn btn-danger" style="color:pink" >Delete</button>
+                                </td>
+
+                                </tr>
+                                        }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+        </div>
+                            @section script{
+                                <script>
+                                    $("#employee-add-form").on('submit', function (e) {
+                                        var data = getFormValues("employee-add-form");
+                                        sendObjectToServer("../../api/Employee/Add", data,
+                                               function () {
+                                                   showModalMessage("Operation success", "Employee added successfully");
+                                               }, function (data) {
+                                                   showModalMessage("Error", "");
+                                               });
+                                        e.preventDefault();
+
+                                    });
+
+                                    $("table").DataTable();
+                                </script>
+                            }

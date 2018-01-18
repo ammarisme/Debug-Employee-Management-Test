@@ -1,0 +1,211 @@
+﻿@using ProductionControllSystem.Areas.Reports.Models
+@model   GaugeReportModel
+@{
+    ViewBag.title = Model.ReportName;
+}
+<title>@ViewBag.title</title>
+
+<div class="col-md-12 panel sub-content-panel" id="report-parameter-panel">
+    <form action="no-implementation" id="report-request-form" method="POST">
+
+        <div id="name-group" class="form-group col-md-4">
+            <label for="name" class="custom-label">From : </label>
+                @if (Model.Container.Count > 0)
+                {
+
+                    @Html.DropDownListFor(m => m.Container,
+                                          new SelectList(Model.Container,
+                                       "Id", "ContainerName",
+                                                Model.Container.First().Id), new { @class = "form-control", id = "Id", name = "Container" })
+                }
+                else
+                {
+                    <label class="custom-label">No Containers.</label>
+                }
+        </div>
+
+        @Html.TextBoxFor(m => m.User, new { @class = "form-control hidden" })
+        @Html.TextBoxFor(m => m.Location, new { @class = "form-control hidden" })
+        @Html.TextBoxFor(m => m.ReportName, new { @class = "form-control hidden" })
+
+        <div id="name-group" class="form-group col-md-4">
+            <div class="col-md-12">
+                <button class="btn btn-primary btn-raised" style="width:100%" id="generate-all-tables">Generate Report</button>
+            </div>
+            <div class="col-md-12">
+                <button class="btn btn-update btn-raise  hidden-xs" style="width:100%" id="print-report-button">Print Report</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<div class="col-md-12 panel sub-content-panel hidden">
+    <h5>@Model.ReportName</h5>
+    <table id="@Model.ReportId" class="display table table-hover table-striped" cellspacing="0" width="100%">
+        <thead>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+            <tr></tr>
+        </tfoot>
+    </table>
+</div>
+<iframe id="ManualFrame"
+        frameborder="0"
+        style="border:0"
+        allowfullscreen
+        typeof="application/pdf"
+        ></iframe>
+@section script{
+    <script>
+        var dataArray;
+        var reportTableId = '@Model.ReportId';
+        var reportName = '@Model.ReportName';
+        var reportTable;
+
+        $("#generate-all-tables").on('click', function (event) {
+
+            var error = "";
+            error = $("select[name=Container]").val() == "0" ? error + "</br>Please select container." : error;
+            var onTableInitialization = function () {
+  
+            }
+
+            var onRecordSelection = function (ev) {
+                var currentValue = ev.find("td:last-child").children().length == 0 ? ev.find("td:last-child").html() : "";
+                ev.removeClass("selected");
+                ev.find("td:last-child").html("<input type='text' class='editable-field'></input>");
+                var remark = ev.find("td:last-child input");
+                remark.val(currentValue);
+                remark.on("focusout", function () {
+                    console.log($(this).val());
+                    $(this).parent().html($(this).val());
+                });
+                remark.focus();
+            };
+            var onRecordUnselection = function () {
+
+            };
+
+            if (error != "") {
+                showModalMessage("Error", error);
+            } else {
+                $("#@Model.ReportId").parent().removeClass("hidden");
+                $.ajax({
+                    type: 'get',
+                    url: '@Model.DataUrl' + "?container=" + $("select[name=Container]").val() +"&location="+$("input[name=Location]").val(),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (response) {
+                        dataArray = response;
+                        if (typeof (dataArray) != 'undefined' && dataArray.length > 0) {
+
+                            reportTable = initiateTable1_2("@Model.ReportId",
+                                {
+                                    "footer": true,
+                                    "bLengthChange": false,
+                                    "aaData": dataArray,
+                                    "order": [[0, "asc"]],
+                                    "rowCallback": function (row, data, index) {
+                                    }
+                                    ,
+                                    "pageLength": 100,
+                                    "aoColumns": [
+                                              { "sTitle": "Lower Bound", "mData": "lowerBound" },
+                                              { "sTitle": "Upper Bound", "mData": "upperBound" },
+                                              { "sTitle": "Volume", "mData": "volume" },
+                                              { "sTitle": "Variance", "mData": "variance" }
+                                    ],
+                                    fullreport: true,
+                                    reportname: "@Model.ReportName"
+                                }
+                            , onRecordSelection, onRecordUnselection , onTableInitialization);
+
+                        } else {
+                            if ($("#" + reportTableId).hasClass("dataTable")) {
+                                $("#" + reportTableId).parent().addClass("hidden");
+                                $("#" + reportTableId).DataTable().destroy();
+                                var element = $("#" + reportTableId);
+                                element.find("tbody").empty();
+                                var div = element.parent();
+                                var title = div.find("h5");
+                                div.html("")
+                                div.append(title);
+                                div.append(element);
+                                div.addClass("hidden");
+                            }
+
+                        }
+
+                    },
+                    error: function (response) {
+                        console.log("failure" + response);
+                    }
+                });
+            }
+            event.preventDefault();
+        });
+
+        $(".navigation-help").html("Reports / @Model.ReportName ");
+
+        var d = new Date();
+        d.setFullYear(d.getFullYear() - 100);
+        $('.datepicker').pickadate({
+            // Escape any “rule” characters with an exclamation mark (!).
+            format: 'yyyy-mm-dd',
+            selectYears: d,
+            max: new Date(),
+            selectMonths: true, // Creates a dropdown to control month
+            selectYears: 15 // Creates a dropdown of 15 years to control year
+        });
+        
+
+        $("#print-report-button").on('click', function () {
+            var doc = new jsPDF('p', 'pt', 'A4');
+            setHeader(doc, reportName);
+            var pageHeight = doc.internal.pageSize.height;
+            var y = 120;
+
+            doc.setFontSize(10);
+            @foreach(ReportParameter paramter in Model.Parameters)
+            {
+                <text>
+            doc.text(40, y, "@paramter.Name  : -  " + $("select[name=@paramter.DataName] :selected").html());
+            y = y + 10
+            </text>
+            }
+
+            var i = 0;
+            var previousTableHeight = 0;
+
+            if (!$("#" + reportTableId).is(":visible") || $("#" + reportTableId).hasClass("picker__table")) {
+                return;
+            }
+            var tableId = reportTableId
+            var tableHeight = parseFloat(getTableHeight(reportTableId));
+
+
+            if (i > -1) {
+                y = y + 50 + previousTableHeight;
+                //if (y + tableHeight >= pageHeight - 30) {
+                //    doc.addPage();
+                //    y = 40;
+                //}
+
+                y = y + 10;
+                var res = doc.autoTableHtmlToJson(document.getElementById(reportTableId), true);
+                doc.autoTable(res.columns, res.data, { margin: { top: y } });
+                previousTableHeight = tableHeight;
+            }
+
+            doc.autoPrint();
+            
+            $("#ManualFrame").attr("height", screen.height);
+            $("#ManualFrame").attr("width", $("#report-parameter-panel").width());
+            $("#ManualFrame").attr("src", doc.output('datauri'));
+            
+            event.preventDefault();
+        });
+        MaterialSelectReinitiate("select[name='Container']", 4);
+    </script>
+}

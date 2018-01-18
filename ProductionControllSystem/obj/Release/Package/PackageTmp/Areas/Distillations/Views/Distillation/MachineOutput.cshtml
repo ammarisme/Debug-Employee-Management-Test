@@ -1,0 +1,841 @@
+﻿@using ProductionControllSystem.Areas.Distillations.Models;
+@using ClassLibrary.DatabaseModels;
+@model  MachineOutputViewModel
+@{
+    ViewBag.title = "Machine Outputs";
+}
+<title>@ViewBag.title</title>
+<h5>@ViewBag.title</h5>
+<ul class="nav nav-tabs" style="margin-bottom: 15px;">
+    <li class="active"><a href="#distillations" data-toggle="tab">Transfer</a></li>
+    <li><a href="#receivers" data-toggle="tab">Receivers</a></li>
+    <li><a href="#machines-tab" data-toggle="tab">Machines</a></li>
+</ul>
+
+<div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active in" id="distillations">
+        <div class="row">
+            <div class="col-md-12">
+                <form action="no-implemetation" id="machine-out-form" method="POST">
+                    <div class="col-md-5 panel sub-content-panel">
+                        <h5>Machine (Still) :</h5>
+
+                        <div class="col-md-12 form-group">
+                            <div class="col-md-4">
+                                <label for="name" class="custom-label pull-right">Machine (still):</label>
+                            </div>
+                            <div class="col-md-8">
+
+                                @Html.DropDownListFor(m => m.DistillationMachineId,
+                                  new SelectList(Model.DistillationMachineId.FindAll(ma => ma.Status == "B"),
+                               "Id", "MachineName",
+                                        Model.DistillationMachineId.First().Id), new { @class = "form-control col-md-12", id = "MachineId", name = "MachineName" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 form-group">
+                            <div class="col-md-4">
+                                <label for="name" class="custom-label pull-right">Status :</label>
+                            </div>
+                            <div class="col-md-8">
+                                @Html.DropDownListFor(m => m.MachineStatus,
+                                  new SelectList(Model.MachineStatus,
+                               "StatusId", "StatusName",
+                                        Model.MachineStatus.First().StatusId), new { @class = "form-control col-md-12", id = "MachineStatus", name = "MachineStatus" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 pull-right panel sub-content-panel">
+                        <h5>Reciever</h5>
+                        <div class="col-md-12 form-group">
+                            <div class="col-md-4">
+                                <label for="name" class="custom-label pull-right">Reciever :</label>
+                            </div>
+                            <div class="col-md-8">
+                                @if (Model.ContainerId.Count > 0)
+                                {
+                                    @Html.DropDownListFor(m => m.ContainerId,
+                                  new SelectList(Model.ContainerId.FindAll(c => c.ContainerType=="RV"),
+                               "Id", "ContainerName",
+                                        Model.ContainerId.First().Id), new { @class = "form-control col-md-12", id = "ContainerId", name = "ContainerName" })
+                                }
+                                else
+                                {
+                                    <label class="custom-label">No Receiver.</label>
+                                }
+                            </div>
+                        </div>
+                        
+                        <div id="name-group" class="col-md-6">
+                            <div class="col-md-6">
+                                <label for="name" class="custom-label pull-right">Current Dip (cm):</label>
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(m => m.ContainerFromDepth, new { @class = "form-control custom-label disabled", tabindex = "-1", required = "true", step = "0.01", autocomplete = "off" })
+                            </div>
+                        </div>
+
+                        <div id="name-group" class="col-md-6">
+                            <div class="col-md-4">
+                                <label for="name" class="custom-label pull-right"> Bulk (l) </label>
+                            </div>
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(m => m.TotalVolume, new { @class = "form-control custom-label ", step = "0.01", autocomplete = "off", disabled = "true" })
+                            </div>
+                        </div>
+
+                        <div id="name-group" class="col-md-6">
+                            <div class="col-md-6">
+                                <label for="name" class="custom-label pull-right">Current Strength:</label>
+                            </div>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(m => m.CurrentStrength, new { @class = "form-control custom-label disabled", tabindex = "-1", required = "true", step = "0.01", autocomplete = "off" })
+                            </div>
+                        </div>
+
+                        <div id="name-group" class="col-md-6">
+                            <div class="col-md-4">
+                                <label for="name" class="custom-label pull-right"> A/A (l) </label>
+                            </div>
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(m => m.CurrentPureVolume, new { @class = "form-control custom-label ", step = "0.01", autocomplete = "off", disabled = "true" })
+                            </div>
+                        </div>
+                    </div>
+                       
+                    <div class="col-md-12 panel pull-left sub-content-panel">
+                            <h5>Production</h5>
+                            @Html.TextBoxFor(m => m.Id, new { @class = "form-control hidden", step = "0.01", autocomplete = "off" })
+                            <div class="col-md-12">
+
+                                <div id="name-group" class="form-group col-md-2">
+                                    <div class="col-md-12">
+                                        <label for="name" class="custom-label">Spirit Type : </label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        @Html.DropDownListFor(m => m.LiquidTypeId,
+                                  new SelectList(Model.LiquidTypeId,
+                               "LiquidTypeId", "LiquidName",
+                                        Model.LiquidTypeId.First().LiquidTypeId), new { @class = "form-control", id = "LiquidTypeId", name = "LiquidTypeName", tabindex = "-1" })
+                                    </div>
+                                </div>
+
+                                <div id="name-group" class="form-group col-md-2">
+                                    <div class="col-md-12">
+                                        <label for="name" class="custom-label">Final Dip(cm):</label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        @Html.TextBoxFor(m => m.ContainerToDepth, new { @class = "form-control custom-text-box", min = "0", required = "true", type = "number", step = "0.1", autocomplete = "off", })
+                                    </div>
+                                </div>
+
+                                <div id="name-group" class="form-group col-md-2">
+                                    <div class="col-md-12">
+                                        <label for="name" class="custom-label">Temperature (C):</label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        @Html.TextBoxFor(m => m.Temperature, new { @class = "form-control custom-text-box", required = "true", type = "number", step = "0.1", min = "0", autocomplete = "off" })
+                                    </div>
+                                </div>
+                                
+                                <div id="name-group" class="form-group col-md-2">
+                                    <div class="col-md-12">
+                                        <label for="name" class="custom-label">Density (kg/m<sup>3</sup>) :</label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        @Html.TextBoxFor(m => m.Density, new { @class = "form-control custom-text-box", required = "true", type = "number", min = "0", step = "0.01", autocomplete = "off" })
+                                    </div>
+                                </div>
+                                
+                                <div id="name-group" class="form-group col-md-2">
+                                    <div class="col-md-12">
+                                        <label for="name" class="custom-label">Transfer Status : </label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        @Html.DropDownListFor(m => m.Status,
+                                  new SelectList(Model.Status,
+                               "Status", "StatusName",
+                                        Model.Status.First().Status), new { @class = "form-control", id = "Status", name = "StatusName", tabindex = "-1" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-md-2 hidden" id="next-dip-input">
+                                    <div class="col-md-12">
+                                        <label for="name" class="custom-label">Next Dip(cm):</label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        @Html.TextBoxFor(m => m.NextDip, new { @class = "form-control custom-text-box", min = "0", value = "0", required = "true", type = "number", step = "0.1", autocomplete = "off", })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div id="name-group" class="form-group col-md-2">
+                                    <div class="col-md-12">
+                                        <label for="name" class="custom-label"> A/A (l) :</label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        @Html.TextBoxFor(m => m.TransferPureVolume, new { @class = "form-control disabled pull-right", tabindex = "-1", required = "true", step = "0.01", autocomplete = "off" })
+                                    </div>
+                                </div>
+
+                                <div id="name-group" class="form-group col-md-2">
+                                    <div class="col-md-12">
+                                        <label for="name" class="custom-label"> Bulk (l) :</label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        @Html.TextBoxFor(m => m.TransferVolume, new { @class = "form-control disabled", tabindex = "-1", required = "true", step = "0.01", autocomplete = "off" })
+                                    </div>
+                                </div>
+
+
+                                <div id="name-group" class="form-group col-md-2">
+                                    <div class="col-md-12">
+                                        <label for="name" class="custom-label">Date: </label>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <span class="input-group-addon custom-datepicker form-control">
+                                            <span class="glyphicon glyphicon-calendar date-icon"></span>
+                                            @Html.TextBoxFor(m => m.OutputTime, new { @class = "datepicker form-control custom-text-box", required = "true" })
+                                        </span>
+                                    </div>
+                                </div>                                
+                                
+                                <div class="col-md-4 pull-right">
+                                    <button id="new-transfer-button" class="btn btn-primary btn-raised pull-right">New Transfer<span class="fa fa-arrow-down"></span></button>
+                                    <button id="update-transfer-button" class="btn btn-warning btn-raised pull-right hidden">Update Last Transfer<span class="fa fa-arrow-down"></span></button>
+                                </div>
+
+                            </div>
+                        </div>
+                    
+                    <div class="col-md-12 panel sub-content-panel pull-right">
+                        <h5>New Readings</h5>
+                        <div class="col-md-12">
+                            <div id="name-group" class="form-group col-md-3">
+                                <div class="col-md-12">
+                                    <label for="name" class="custom-label"> Bulk (l) :</label>
+                                </div>
+                                <div class="col-md-12">
+                                    @Html.TextBoxFor(m => m.NewBulkVolume, new { @class = "form-control disabled", tabindex = "-1", required = "true", step = "0.01", autocomplete = "off" })
+                                </div>
+                            </div>
+
+                            <div id="name-group" class="form-group col-md-3">
+                                <div class="col-md-12">
+                                    <label for="name" class="custom-label">A/A (l):</label>
+                                </div>
+                                <div class="col-md-12">
+                                    @Html.TextBoxFor(m => m.NewPureVolume, new { @class = "form-control disabled", tabindex = "-1", required = "true", step = "0.01", autocomplete = "off" })
+                                </div>
+                            </div>
+
+                            <div id="name-group" class="form-group col-md-3">
+                                <div class="col-md-12">
+                                    <label for="name" class="custom-label">Strength:</label>
+                                </div>
+                                <div class="col-md-12">
+                                    @Html.TextBoxFor(m => m.Strength, new { @class = "form-control disabled", tabindex = "-1", required = "true", step = "0.01", autocomplete = "off" })
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    @Html.TextBoxFor(m => m.CreatedUser, new { @class = "form-control hidden", required = "true", type = "text", novalidate = "" })
+                    @Html.TextBoxFor(m => m.LocationId, new { @class = "form-control hidden", required = "true", type = "text", novalidate = "" })
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="receivers">
+        <div class="row">
+            <div class="col-md-12 panel sub-content-panel pull-right">
+                <h5>Recievers</h5>
+                <table id="recievers-table" class="display table table-hover table-striped" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Reciever</th>
+                            <th>Spirit Type</th>
+                            <th>Current Dip (cm)</th>
+                            <th>Bulk(l)</th>
+                            <th>A/A(l)</th>
+                            <th>Strength</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Container reciever in Model.ContainerId)
+                        {
+                            if (reciever.Id != "-1" && (reciever.ContainerType=="RV" || reciever.ContainerType=="AV"))
+                            {
+                                <tr>
+                                    <td>
+                                        @reciever.ContainerName
+                                    </td>
+                                    <td>
+                                        @if (Model.LiquidTypeId.Find(l => l.LiquidTypeId == reciever.LiquidTypeId) != null && reciever.CurrentDepth > 0)
+                                        {
+                                            <span>@Model.LiquidTypeId.Find(l => l.LiquidTypeId == reciever.LiquidTypeId).LiquidName</span>
+                                        }
+                                        else if (reciever.CurrentDepth == 0)
+                                        {
+                                            <span>Empty</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Unknown</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @reciever.CurrentDepth
+                                    </td>
+                                    <td>
+                                        @reciever.FilledVolume
+                                    </td>
+                                    <td>
+                                        @reciever.PureVolume
+                                    </td>
+                                    <td>
+                                        @reciever.Strength
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="machines-tab">
+        <div class="row">
+            <div class="col-md-12 panel sub-content-panel">
+                <h5>Machine</h5>
+                <form action="no-implementations" id="machine-update-form">
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <div class="col-md-4">
+                                <label for="name" class="custom-label pull-right">Machine :</label>
+                            </div>
+                            <div class="col-md-8">
+                                @Html.DropDownListFor(m => m.DistillationMachineId,
+                                  new SelectList(Model.DistillationMachineId,
+                               "Id", "MachineName",
+                                        Model.DistillationMachineId.First().Id), new { @class = "form-control col-md-12", id = "DistillationMachineId", name = "DistillationMachineId" })
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <div class="col-md-4">
+                                <label for="name" class="custom-label pull-right">Machine :</label>
+                            </div>
+                            <div class="col-md-8">
+                                @Html.DropDownListFor(m => m.DistillationMachineId,
+                                  new SelectList(Model.DistillationMachineId,
+                               "Id", "MachineName",
+                                        Model.DistillationMachineId.First().Id), new { @class = "form-control col-md-12", id = "DistillationMachineId", name = "DistillationMachineId" })
+                            </div>
+                        </div>
+
+                        <div id="name-group" class="form-group col-md-4">
+                            <div class="col-md-4">
+                                <label for="name" class="custom-label">Date: </label>
+                            </div>
+                            <div class="col-md-8">
+                                <span class="input-group-addon custom-datepicker form-control">
+                                    <span class="glyphicon glyphicon-calendar date-icon"></span>
+                                    @Html.TextBoxFor(m => m.OutputTime, new { @class = "datepicker form-control custom-text-box", required = "true" })
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 form-group">
+                            <div class="col-md-4">
+                                <label for="name" class="custom-label pull-right">Status :</label>
+                            </div>
+                            <div class="col-md-8">
+                                @Html.DropDownListFor(m => m.MachineStatus,
+                                  new SelectList(Model.MachineStatus,
+                               "StatusId", "StatusName",
+                                        Model.MachineStatus.First().StatusId), new { @class = "form-control col-md-12", id = "MachineStatus", name = "MachineStatus" })
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 pull-right">
+                            <button type="submit" id="machine-update-button" class="btn btn-warning btn-raised pull-right">Update Status<span class="fa fa-arrow-down"></span></button>
+                        </div>
+                        <div class="col-md-3 pull-right">
+                            <button type="submit" id="machine-summary-button" class="btn btn-default btn-raised pull-right">Get Machine Summary<span class="fa fa-arrow-down"></span></button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-12 panel sub-content-panel hidden" id="machine-summary-div">
+                <h5>Distillations</h5>
+                <table id="machine-summary-table" class="display table table-hover table-striped" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th class="col-md-2">Distillation Type</th>
+                            <th class="col-md-2">Bulk Toddy(l)</th>
+                            <th class="col-md-2">Pure Toddy(l)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot>
+                        <tr></tr>
+                    </tfoot>
+                </table>
+                <h5>Machine Outs</h5>
+                <table id="machine-out-summary-table" class="display table table-hover table-striped" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th class="col-md-2">Receiver</th>
+                            <th class="col-md-2">Bulk Spirit</th>
+                            <th class="col-md-2">A/A (l)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot>
+                        <tr></tr>
+                    </tfoot>
+                </table>
+                <div id="name-group" class="col-md-6">
+                    <div class="col-md-4">
+                        <label for="name" class="custom-label pull-right"> Total A/A output (l) </label>
+                    </div>
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(m => m.TotalMachineOut, new { @class = "form-control custom-label", step = "0.01", autocomplete = "off", disabled = "true" })
+                    </div>
+                </div>
+
+                <div id="name-group" class="col-md-6">
+                    <div class="col-md-4">
+                        <label for="name" class="custom-label pull-right"> F/D(l) </label>
+                    </div>
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(m => m.TotalToddyTurnover, new { @class = "form-control custom-label ", step = "0.01", autocomplete = "off", disabled = "true" })
+                    </div>
+                </div>
+                <div id="name-group" class="col-md-6">
+                    <div class="col-md-4">
+                        <label for="name" class="custom-label pull-right"> Total Pure Toddy(l) </label>
+                    </div>
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(m => m.TotalPureToddyIntake, new { @class = "form-control custom-label ", step = "0.01", autocomplete = "off", disabled = "true" })
+                    </div>
+                </div>
+                <div id="name-group" class="col-md-6">
+                    <div class="col-md-4">
+                        <label for="name" class="custom-label pull-right"> Out-Turn (l) </label>
+                    </div>
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(m => m.Outcome, new { @class = "form-control custom-label ", step = "0.01", autocomplete = "off", disabled = "true" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script{
+    <script>
+        var container = null;
+        var liquidTypeSelected = function () {
+            console.log("asd");
+        };
+        var receiverDetails;
+        var numberOfOutputs = 0;
+        var onCompletion = function () {
+            var sale = getTableData(machinesTable);
+            var total = 0.00;
+            for (var key in sale) {
+                if (sale.hasOwnProperty(key)) {
+                    var unitPrice = sale[key]["UnitPrice"];
+                    var quantity = sale[key]["Quantity"];
+                    var subTotal = unitPrice * quantity;
+                    total = total + subTotal;
+                }
+            }
+
+
+            if (total - parseInt(total) > 0) {
+                // this is a float number
+                if (((total - parseInt(total)) * 100) < 10 || parseInt(((total - parseInt(total)) * 100)) % 10 != 0) {
+                    $("#total-sale-amount").html(total + "0");
+                } else {
+                    $("#total-sale-amount").html(total + "0");
+
+                }
+
+            } else {
+                $("#total-sale-amount").html(total + ".00")
+            }
+        };
+        var beforeSubmission = function () {
+            var subtotal = parseFloat($("#unit-price-input").val()) * parseFloat($("#quantity-input").val());
+            $("#subtotal-input").val(subtotal);
+        };
+        var machineSummaryDiv = $("#machine-summary-div").html();
+        $("#machine-out-form").on('submit', function (event) {
+            if ($("#new-transfer-button").hasClass("disabled")) {
+                return false;
+            }
+            var data = getFormValues("machine-out-form");
+            var error = "<ul>";
+            error = ($("input[name='OutputTime']").val() == "") ? error + '<div class="alert alert-danger col-md-12">Please enter date</div>' : error;
+            error = ($("#machine-out-form input[name='TransferPureVolume']").val() == "") ? error + '<div class="alert alert-danger col-md-12">Invalid Production information. Please check</div>' : error;
+            if (error != "<ul>") {
+                error += "</ul>"
+                showModalMessage("Error", error);
+                event.preventDefault();
+                return;
+            }
+
+            sendObjectToServer("../../api/Distillation/MachineOut", data,
+               function () {
+                   showModalMessage("Distillation", "<li>" + $("#machine-out-form select[name='LiquidTypeId'] option:selected").text() + " transfered to reciever " + $("#machine-out-form select[name='ContainerId'] option:selected").text() + "</li>");
+                   $("#new-transfer-button").addClass("disabled");
+                   return;
+               }, function (message) {
+                   showModalMessage("Error", message);
+               });
+
+            if (data["MachineStatus"] == "A") {
+                $.ajax({
+                    type: 'get',
+                    url: "../../api/Machines/UpdatePOTStatus?id=" + $("#machine-out-form select[name=DistillationMachineId]").val() + "&status=" + data["MachineStatus"]+"&date="+data["OutputTime"],
+                    dataType: 'json',
+                    async: false,
+                    contentType: 'application/json',
+                    success: function (response) { },
+                    error: function (response) { }
+                });
+            }
+
+            event.preventDefault();
+        });
+
+        $("#machine-summary-button").click(function (event) {
+            if ($("input[name=InputDateTime]").val() == "") {
+                showModalMessage("Error", "Please choose a date.");
+            }
+
+            var data = getFormValues("machine-update-form");
+            var distillations = null;
+            var machineOuts = null;
+            var totalMachineOut = 0;
+            var totalToddyTurnover = 0;
+            var totalRedistilledAlcohol = 0;
+            var totalPureToddyIntake = 0;
+            if ($("#machine-summary-table").hasClass("dataTable")) {
+                $("#machine-summary-div").html(machineSummaryDiv)
+                $("#machine-summary-div").removeClass("hidden");
+            }
+
+
+            $.ajax({
+                type: 'get',
+                url: "../../api/Distillation/GetDistillationsPerMachine?machineId=" + $("#machine-update-form select[name=DistillationMachineId]").val() + "&date=" + data["OutputTime"],
+                dataType: 'json',
+                async: false,
+                contentType: 'application/json',
+                success: function (response) {
+                    distillations = response;
+                    initiateTable1("machine-summary-table", {
+                        "bLengthChange": false,
+                        "sDom": "t",
+                        "language": {
+                            "emptyTable": "No Recievers available."
+                        },
+                        "aoColumns": [
+                              { "sTitle": "Distillation Type", "mData": "distillationType" },
+                              { "sTitle": "Bulk Volume", "mData": "inputGrossVolume" },
+                              { "sTitle": "A/A", "mData": "inputPureVolume" },
+                        ],
+                        "data": response
+                    }, function () { }, function () { });
+                },
+                error: function (response) {
+                    showModalMessage("Failed", "Check your inputs");
+                }
+            });
+
+            $.ajax({
+                type: 'get',
+                url: "../../api/Distillation/GetMachineOutsPerMachinePerDate?machineId=" + $("#machine-update-form select[name=DistillationMachineId]").val() + "&date=" + data["OutputTime"],
+                dataType: 'json',
+                async: false,
+                contentType: 'application/json',
+                success: function (response) {
+                    machineOuts = response;
+                    initiateTable1("machine-out-summary-table", {
+                        "bLengthChange": false,
+                        "sDom": "t",
+                        "language": {
+                            "emptyTable": "No Recievers available."
+                        },
+                        "aoColumns": [
+                              { "sTitle": "Reciever", "mData": "containerId" },
+                              { "sTitle": "Bulk Volume", "mData": "transferVolume" },
+                              { "sTitle": "A/A", "mData": "transferPureVolume" },
+                        ],
+                        "data": response
+                    }, function () { }, function () { });
+                },
+                error: function (response) {
+                    showModalMessage("Failed", "Check your inputs");
+                }
+            });
+
+            for (var key in machineOuts) {
+                totalMachineOut += !isNaN(parseFloat(machineOuts[key]["transferPureVolume"])) ? parseFloat(machineOuts[key]["transferPureVolume"]) : 0
+                $("#machine-summary-div").removeClass("hidden");
+            }
+            for (var key in distillations) {
+                if (distillations[key]["distillationType"] == "Redistillation") {
+                    totalRedistilledAlcohol += !isNaN(parseFloat(distillations[key]["inputPureVolume"])) ? parseFloat(distillations[key]["inputPureVolume"]) : 0
+                } else {
+                    totalPureToddyIntake += !isNaN(parseFloat(distillations[key]["inputPureVolume"])) ? parseFloat(distillations[key]["inputPureVolume"]) : 0
+                }
+                $("#machine-summary-div").removeClass("hidden");
+            }
+
+            $("input[name=TotalMachineOut]").val(totalMachineOut);
+
+            $("input[name=TotalPureToddyIntake]").val(totalPureToddyIntake);
+
+            $("input[name=TotalToddyTurnover]").val(totalMachineOut - totalRedistilledAlcohol);
+
+            $("input[name=Outcome]").val((((totalMachineOut - totalRedistilledAlcohol) / totalPureToddyIntake) * 100).toFixed(1));
+
+            event.preventDefault();
+        });
+
+        $("#machine-out-form select[name='ContainerId']").change(function () {
+
+            var lastTransfer;
+            var containerId = $(this).val();
+            if (container == "-1") {
+                return;
+            }
+
+            $.ajax({
+                type: 'get',
+                url: "../../api/Distillation/LastTransferToReciever?recieverId=" + containerId,
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (response) {
+                    lastTransfer = response;
+                    $("#last-transfer-form input[name='Id']").val(response["id"]);
+                    $("#last-transfer-form input[name='ContainerId']").val(response["containerId"]);
+                    $("#last-transfer-form input[name='ContainerFromDepth']").val(response["containerFromDepth"]);
+                    $("#last-transfer-form input[name='ContainerToDepth']").val(response["containerToDepth"]);
+                    $("#last-transfer-form input[name='Temperature']").val(response["temperature"]);
+                    $("#last-transfer-form input[name='Density']").val(response["density"]);
+                    $("#last-transfer-form input[name='Strength']").val(response["strength"]);
+                    $("#last-transfer-form input[name='LiquidTypeId']").val(response["liquidTypeId"]);
+                    $("#last-transfer-form input[name='CreatedUser']").val(response["createdUser"]);
+                    $("#last-transfer-form input[name='DistillationMachineId']").val(response["distillationMachineId"]);
+
+                    $.ajax({
+                        type: 'get',
+                        url: "../../api/Container/Get?containerId=" + containerId,
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        success: function (response) {
+                            container = response;
+                            MaterialSelectReinitiate("#machine-out-form select[name=LiquidTypeId]", response["liquidTypeId"])
+                            $("#machine-out-form input[name='ContainerFromDepth']").val(response["currentDepth"]);
+                            $("#machine-out-form input[name=ContainerToDepth]").attr("max", container["maxDepth"]);
+                            $("#machine-out-form input[name=ContainerToDepth]").attr("min", parseFloat(container["currentDepth"]) + 1);
+                            $("#machine-out-form input[name='TotalVolume']").val(parseFloat(response["fillVolume"]));
+                            $("#machine-out-form input[name='CurrentPureVolume']").val(parseFloat(response["pureVolume"]));
+                            $("#machine-out-form input[name='CurrentStrength']").val(response["strength"]);
+
+                            if ((parseFloat(container["currentDepth"]) <= 2 && (parseFloat(container["liquidTypeId"]) == 6 || parseFloat(container["liquidTypeId"]) == 7)) || parseFloat(container["currentDepth"]) == 0) {
+                                $("#machine-out-form select[name='LiquidTypeId']").removeClass("disabled");
+                            } else {
+                                $("#machine-out-form select[name='LiquidTypeId']").parent().addClass("disabled");
+                            }
+
+
+                            $("#machine-out-form input[name='ContainerToDepth']").val("");
+                            $("#machine-out-form input[name='Temperature']").val("");
+                            $("#machine-out-form input[name='Density']").val("");
+                            $("#machine-out-form input[name='Strength']").val("");
+                            $("#machine-out-form input[name='TransferBulkVolume']").val("");
+                            $("#machine-out-form input[name='TransferPureVolume']").val("");
+                        },
+                        error: function (response) {
+                            console.log("failure" + response);
+                        }
+                    });
+                },
+                error: function (response) {
+                    console.log("failure" + response);
+                }
+            });
+
+
+        });
+
+        $("#machine-out-form input[name='Density']").change(function () {
+            var density = !isNaN(parseFloat($("#machine-out-form input[name='Density']").val())) ? parseFloat($("#machine-out-form input[name='Density']").val()) : 0;
+            var temperature = !isNaN(parseFloat($("#machine-out-form input[name='Temperature']").val())) ? parseFloat($("#machine-out-form input[name='Temperature']").val()) : 0;
+            var volume = !isNaN(parseFloat($("#machine-out-form input[name='TransferVolume']").val())) ? parseFloat($("#machine-out-form input[name='TransferVolume']").val()) : 0;
+            var strength = getStrength($(this).val(), temperature);
+
+            if (density * temperature != 0) {
+                strength = !isNaN(parseFloat(strength)) ? parseFloat(strength) : 0;
+                var volume = !isNaN(parseFloat(volume)) ? parseFloat(volume) : 0;
+                var currentPure = !isNaN(parseFloat(container["pureVolume"])) ? parseFloat(container["pureVolume"]) : 0;
+                var currentBulkVolume = !isNaN(parseFloat(container["fillVolume"])) ? parseFloat(container["fillVolume"]) : 0;
+                var addedPureVolume = (((currentBulkVolume + volume) * strength) / 100) - parseFloat(container["pureVolume"]);
+
+                var currentPureVolume = !isNaN(parseFloat(container["pureVolume"])) ? parseFloat(container["pureVolume"]) : 0;
+                var currentBulkVolume = !isNaN(parseFloat(container["fillVolume"])) ? parseFloat(container["fillVolume"]) : 0;
+
+                $("#machine-out-form input[name='TransferPureVolume']").val(addedPureVolume.toFixed(1));
+                $("#machine-out-form input[name='NewPureVolume']").val((currentPure + addedPureVolume).toFixed(1));
+                $("#machine-out-form input[name='NewBulkVolume']").val((currentBulkVolume + volume).toFixed(1));
+                $("#machine-out-form input[name='Strength']").val(strength.toFixed(1));
+            } else {
+                $("#machine-out-form input[name='Strength']").val("0");
+            }
+        });
+
+        $("#machine-out-form input[name='Temperature']").change(function () {
+            var density = !isNaN(parseFloat($("#machine-out-form input[name='Density']").val())) ? parseFloat($("#machine-out-form input[name='Density']").val()) : 0;
+            var temperature = !isNaN(parseFloat($("#machine-out-form input[name='Temperature']").val())) ? parseFloat($("#machine-out-form input[name='Temperature']").val()) : 0;
+            var volume = !isNaN(parseFloat($("#machine-out-form input[name='TransferVolume']").val())) ? parseFloat($("#machine-out-form input[name='TransferVolume']").val()) : 0;
+
+            if (density * temperature != 0) {
+                var strength = getStrength($("#machine-out-form input[name='Density']").val(), $(this).val());
+                strength = !isNaN(parseFloat(strength)) ? parseFloat(strength) : 0;
+                var volume = !isNaN(parseFloat(volume)) ? parseFloat(volume) : 0;
+                var addedPureVolume = (((parseFloat(container["fillVolume"]) + volume) * strength) / 100) - parseFloat(container["pureVolume"]);
+                var currentPureVolume = !isNaN(parseFloat(container["pureVolume"])) ? parseFloat(container["pureVolume"]) : 0;
+                var currentBulkVolume = !isNaN(parseFloat(container["fillVolume"])) ? parseFloat(container["fillVolume"]) : 0;
+
+                $("#machine-out-form input[name='TransferPureVolume']").val(addedPureVolume.toFixed(1));
+                $("#machine-out-form input[name='NewPureVolume']").val((currentPureVolume + addedPureVolume).toFixed(1));
+                $("#machine-out-form input[name='NewBulkVolume']").val((currentBulkVolume + volume).toFixed(1));
+                $("#machine-out-form input[name='Strength']").val(strength);
+            } else {
+                $("#machine-out-form input[name='Strength']").val("0");
+            }
+        });
+
+        $("#machine-out-form input[name='TransferVolume']").change(function () {
+            if ($("#machine-out-form input[name='Strength']").val() != '' && $("#machine-out-form input[name='Density']").val() != '' && $(this).val() != "") {
+                var strength = parseFloat($("#machine-out-form input[name='Strength']").val());
+                var density = parseFloat($("#machine-out-form input[name='Density']").val());
+                var volume = parseFloat($("#machine-out-form input[name='TransferVolume']").val());
+
+                strength = !isNaN(parseFloat(strength)) ? parseFloat(strength) : 0;
+                var volume = !isNaN(parseFloat(volume)) ? parseFloat(volume) : 0;
+                volume = !isNaN(parseFloat(volume)) ? volume : 0;
+
+                var addedPureVolume = (((parseFloat(container["fillVolume"]) + volume) * strength) / 100) - parseFloat(container["pureVolume"]);
+                $("#machine-out-form input[name='TransferPureVolume']").val(addedPureVolume.toFixed(1));
+            } else {
+
+            }
+        });
+
+        $("#machine-out-form input[name='ContainerToDepth']").change(function () {
+            var strength = parseFloat($("#machine-out-form input[name='Strength']").val() != "" || $("#machine-out-form input[name='Strength']").val() != "Error" ? parseFloat($("#machine-out-form input[name='Strength']").val()) : 0);
+            var density = parseFloat($("#machine-out-form input[name='Density']").val());
+            var containerId = $("#machine-out-form input[name='ContainerId']").val() != "" ? parseFloat($("#machine-out-form select[name='ContainerId']").val()) : 0;
+            var containerFromDepth = $("#machine-out-form  input[name='ContainerFromDepth']").val() != "" ? parseFloat($("#machine-out-form  input[name='ContainerFromDepth']").val()) : 0;
+            var containerToDepth = $(this).val() != "" ? parseFloat($(this).val()) : 0;
+            var volume = parseFloat(getVolume(containerId, containerFromDepth, containerToDepth));
+            volume = !isNaN(parseFloat(volume)) ? volume : 0;
+
+            strength = !isNaN(parseFloat(strength)) ? parseFloat(strength) : 0;
+            var addedPureVolume = (((parseFloat(container["fillVolume"]) + volume) * strength) / 100).toFixed(1) - parseFloat(container["pureVolume"]).toFixed(1);
+            $("#machine-out-form input[name='TransferVolume']").val(volume.toFixed(1));
+            $("#machine-out-form input[name='TransferPureVolume']").val(addedPureVolume.toFixed(1));
+        });
+
+        $("#machine-update-form").on('submit', function (event) {
+            var data = getFormValues("machine-update-form");
+            $.ajax({
+                type: 'get',
+                url: "../../api/Machines/UpdateStatus?id=" + $("#machine-update-form select[name=DistillationMachineId]").val() + "&status=" + data["MachineStatus"],
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (response) {
+                    showModalMessage("Success", "Machine Updated");
+                },
+                error: function (response) {
+                    showModalMessage("Failed", "Check your inputs");
+                }
+            });
+
+            event.preventDefault();
+        });
+
+        $('select').each(function () {
+            $(this).material_select();
+            $(this).siblings("span").html("");
+            $(this).addClass("hidden");
+        });
+
+        var d = new Date();
+        d.setFullYear(d.getFullYear() - 100);
+        $('.datepicker').pickadate({
+            // Escape any “rule” characters with an exclamation mark (!).
+            format: 'yyyy-mm-dd',
+            selectYears: d,
+            max: new Date(),
+            selectMonths: true, // Creates a dropdown to control month
+            selectYears: 15 // Creates a dropdown of 15 years to control year
+        });
+
+        var transfersTable = initiateTable1("transfers-table",
+            {
+                "sDom": "t",
+                "language": {
+                    "emptyTable": "Please add transfers"
+                },
+                "columnDefs": [
+                                    {
+                                        "targets": [0, 1],
+                                        "visible": false,
+                                        "searchable": false
+                                    }
+                ]
+                                     ,
+                "bLengthChange": false,
+                "aoColumns": [
+                                              { "sTitle": "Container", "mData": "Container" },
+                                              { "sTitle": "LiquidTypeId", "mData": "LiquidTypeId" },
+                                              { "sTitle": "Container", "mData": "ContainerName" },
+                                              { "sTitle": "Liquid", "mData": "LiquidName" },
+                                              { "sTitle": "Cur. Dip", "mData": "CurrentDip" },
+                                              { "sTitle": "Final Dip", "mData": "FinalDip" },
+                                              { "sTitle": "Bulk (l)", "mData": "BulkVolume" },
+                                              { "sTitle": "Strength", "mData": "Strength" },
+                                              { "sTitle": "A/A (l)", "mData": "PureVolume" },
+                                              { "sTitle": "Density", "mData": "Density" },
+                                              { "sTitle": "Temperatire", "mData": "Temperature" },
+                ]
+
+            }
+        , function () { }, function () { });
+
+        $("#Status").on("change", function () {
+            if ($(this).val() == "I") {
+                $("input[name=NextDip]").parent().parent().removeClass("hidden");
+            } else {
+                $("input[name=NextDip]").parent().parent().addClass("hidden");
+            }
+        });
+
+        $(".navigation-help").html("Distillation / Machine output");
+    </script>
+}

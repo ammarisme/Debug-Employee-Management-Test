@@ -1,0 +1,178 @@
+﻿@using ProductionControllSystem.Areas.Reports.Models
+@model   ToddyIntakeReportModel
+@{
+    ViewBag.title = Model.ReportName;
+}
+<title>@ViewBag.title</title>
+
+<div class="col-md-12 panel sub-content-panel">
+    <form action="no-implementation" id="report-request-form" method="POST">
+        <div id="name-group" class="form-group col-md-4">
+            <label for="name" class="custom-label">From : </label>
+            <span class="input-group-addon custom-datepicker form-control">
+                <span class="glyphicon glyphicon-calendar date-icon"></span>
+                @Html.TextBoxFor(m => m.FromTime, new { @class = "row datepicker form-control custom-text-box", required = "true", type = "text" })
+            </span>
+        </div>
+
+        <div id="name-group" class="form-group col-md-4">
+            <label for="name" class="custom-label">To: </label>
+            <span class="input-group-addon custom-datepicker form-control">
+                <span class="glyphicon glyphicon-calendar date-icon"></span>
+                @Html.TextBoxFor(m => m.ToTime, new { @class = "row datepicker form-control custom-text-box", required = "true", type = "text" })
+            </span>
+        </div>
+
+        @Html.TextBoxFor(m => m.User, new { @class = "form-control hidden" })
+        @Html.TextBoxFor(m => m.Location, new { @class = "form-control hidden" })
+        @Html.TextBoxFor(m => m.ReportName, new { @class = "form-control hidden" })
+
+
+        <div id="name-group" class="form-group col-md-4">
+            <div class="col-md-12">
+                <button class="btn btn-primary btn-raised" style="width:100%" id="generate-all-tables">Generate Report</button>
+            </div>
+            <div class="col-md-12">
+                <button class="btn btn-update btn-raise  hidden-xs" style="width:100%" id="print-report-button">Print Report</button>
+            </div>
+
+        </div>
+    </form>
+</div>
+<div class="col-md-12 panel sub-content-panel hidden">
+    <h5>@Model.ReportName</h5>
+    <table id="@Model.ReportId" class="display table table-hover table-striped" cellspacing="0" width="100%">
+        <thead>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+            <tr></tr>
+        </tfoot>
+    </table>
+</div>
+
+@section script{
+    <script>
+        var onSaleSelection = function () { };
+        var onSaleUnselection = function () { };
+        var dataArray;
+        var reportTableId = '@Model.ReportId';
+        var reportName ='@Model.ReportName';
+        
+        $("#generate-all-tables").on('click', function (event) {
+
+            var error = "";
+            error = $("input[name=FromTime]").val() == "" ? error + "</br>Please enter from date." : error;
+            error = $("input[name=ToTime]").val() == "" ? error + "</br>Please enter to date." : error;
+
+            if (error != "") {
+                showModalMessage("Error", error);
+            } else {
+                $("#"+"@Model.ReportId").parent().removeClass("hidden");
+                $.ajax({
+                    type: 'get',
+                    url: '@Model.DataUrl'+"?"+"from=" + $("input[name=FromTime]").val() + "&to=" + $("input[name=ToTime]").val() + "&location=" + $("input[name=Location]").val(),
+                    dataType: 'json',
+                    async: false,
+                    contentType: 'application/json',
+                    success: function (response) {
+                        dataArray = response;
+                        if (typeof (dataArray) != 'undefined' && dataArray.length > 0) {
+                            initiateTable1(reportTableId,
+                                {
+                                    "footer": true,
+                                    "bLengthChange": false,
+                                    "aaData": dataArray
+                                    ,
+                                    "aoColumns": [
+                                              { "sTitle": "Time", "mData": "inputDateTime" },
+                                              { "sTitle": "Bulk(l)", "mData": "bulkVolume" },
+                                              { "sTitle": "Strength", "mData": "strength" },
+                                              { "sTitle": "A/A(l)", "mData": "pureVolume" }
+                                    ],
+                                    fullreport: true,
+                                    reportname: "@Model.ReportName"
+                                }
+                            , onSaleSelection, onSaleUnselection);
+                        } else {
+                            if ($("#" + reportTableId).hasClass("dataTable")) {
+                                $("#" + reportTableId).parent().addClass("hidden");
+                                $("#" + reportTableId).DataTable().destroy();
+                                var element = $("#" + reportTableId);
+                                element.find("tbody").empty();
+                                var div = element.parent();
+                                var title = div.find("h5");
+                                div.html("")
+                                div.append(title);
+                                div.append(element);
+                                div.addClass("hidden");
+                            }
+                        }
+
+                    },
+                    error: function (response) {
+                        console.log("failure" + response);
+                    }
+                });
+            }
+            event.preventDefault();
+        });
+
+        $(".navigation-help").html("Reports / @Model.ReportName ");
+
+        var d = new Date();
+        d.setFullYear(d.getFullYear() - 100);
+        $('.datepicker').pickadate({
+            // Escape any “rule” characters with an exclamation mark (!).
+            format: 'yyyy-mm-dd',
+            selectYears: d,
+            max: new Date(),
+            selectMonths: true, // Creates a dropdown to control month
+            selectYears: 15 // Creates a dropdown of 15 years to control year
+        });
+
+
+        $("#print-report-button").on('click', function () {
+            var doc = new jsPDF('p', 'pt', 'A4');
+            setHeader(doc, reportName);
+            var pageHeight = doc.internal.pageSize.height;
+            var y = 120;
+
+            doc.setFontSize(10);
+            @foreach(ReportParameter paramter in Model.Parameters)
+            {
+                <text>
+                doc.text(40, y, "@paramter.Name  : -  " + $("input[name=@paramter.DataName]").val());
+                y = y + 10
+                </text>
+            }
+
+            var i = 0;
+            var previousTableHeight = 0;
+
+            if (!$("#" + reportTableId).is(":visible") || $("#" + reportTableId).hasClass("picker__table")) {
+                return;
+            }
+            var tableId = reportTableId
+            var tableHeight = parseFloat(getTableHeight(reportTableId));
+
+
+            if (i > -1) {
+                y = y + 50 + previousTableHeight;
+                if (y + tableHeight >= pageHeight - 30) {
+                    doc.addPage();
+                    y = 40;
+                }
+
+                y = y + 10;
+                var res = doc.autoTableHtmlToJson(document.getElementById(reportTableId), true);
+                doc.autoTable(res.columns, res.data, { margin: { top: y } });
+                previousTableHeight = tableHeight;
+            }
+
+            doc.autoPrint();
+            window.open(doc.output('datauristring'));
+            event.preventDefault();
+        });
+    </script>
+}

@@ -1,0 +1,16 @@
+
+ INSERT Employee - "ERROR [42000] [Microsoft][ODBC SQL Server Driver][SQL Server]Incorrect syntax near \u0027)\u0027. - Query :INSERT INTO MFGTEST.Employee (  )  VALUES (  )"
+
+ INSERT Employee - "ERROR [42000] [Microsoft][ODBC SQL Server Driver][SQL Server]Incorrect syntax near \u0027)\u0027. - Query :INSERT INTO MFGTEST.Employee (  )  VALUES (  )"
+
+ INSERT Employee - "ERROR [42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name \u0027MFGTEST.Employee\u0027. - Query :INSERT INTO MFGTEST.Employee ( EmployeeNo,EmployeeName,Department,Email,ContactNo )  VALUES ( \u002723\u0027 , \u0027Nad\u0027 , \u002733\u0027 , \u0027sddf@gsf.com\u0027 , \u0027sds\u0027 )"
+
+ INSERT Employee - "ERROR [42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name \u0027MFGTEST.Employee\u0027. - Query :INSERT INTO MFGTEST.Employee ( EmployeeNo,EmployeeName,Department,Email,ContactNo )  VALUES ( \u002723\u0027 , \u0027Nad\u0027 , \u002733\u0027 , \u0027sddf@gsf.com\u0027 , \u0027sds\u0027 )"
+
+ INSERT Employee - "ERROR [42S02] [Microsoft][ODBC SQL Server Driver][SQL Server]Invalid object name \u0027EmployeeManagement.Employee\u0027. - Query :INSERT INTO EmployeeManagement.Employee ( EmployeeNo,EmployeeName,Department,Email,ContactNo )  VALUES ( \u002723\u0027 , \u0027Nad\u0027 , \u002733\u0027 , \u0027sddf@gsf.com\u0027 , \u0027sds\u0027 )"
+
+ INSERT Employee - "ERROR [42000] [Microsoft][ODBC SQL Server Driver][SQL Server]Incorrect syntax near \u0027)\u0027. - Query :INSERT INTO [EmployeeManagement].[dbo].[Employee ( EmployeeNo,EmployeeName,Department,Email,ContactNo] )  VALUES ( \u002723\u0027 , \u0027Nad\u0027 , \u002733\u0027 , \u0027sddf@gsf.com\u0027 , \u0027sds\u0027 )"
+
+ INSERT INTO [EmployeeManagement].[dbo].[Employee] ( EmployeeNo,EmployeeName,Department,Email,ContactNo )  VALUES ( '23' , 'Nad' , '33' , 'sddf@gsf.com' , 'sds' )
+
+ INSERT Employee - "0"

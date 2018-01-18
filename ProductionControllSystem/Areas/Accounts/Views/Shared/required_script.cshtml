@@ -1,0 +1,97 @@
+﻿<script>
+
+    $.material.init();
+
+    $("#dropdown-menu select").dropdown();
+   
+    // Initialize collapse button
+    $(".button-collapse").sideNav();
+    // Initialize collapsible (uncomment the line below if you use the dropdown variation)
+    //$('.collapsible').collapsible();
+
+    var loader = $(".cs-loader");
+
+    $.pjax.defaults.timeout = false;
+
+    $('a[withpjax]').each(function () {
+        
+        $(this).pjax(
+            {
+                container: ".content-panel",
+            }
+        );
+    });
+
+    $(".cs-loader").hide();
+    $(document).on({
+        "ajaxStart": function () {
+            $(".cs-loader").show();
+        },
+        "ajaxStop": function () { $(".cs-loader").hide(); },
+    });
+
+    $(".button-collapse").on('click', function () {
+    if ($(this).hasClass("menu-open")) {
+        $(this).removeClass("menu-open");
+        $(this).html('<i class="material-icons">chevron_right</i>');
+    } else {
+        $(this).addClass("menu-open");
+        $(this).html('<i class="material-icons">chevron_left</i>');
+    }
+    });
+
+    $(".treeview a").on('click', function () {
+        // hide all other menus
+        $(this).parent().siblings().children("ul").removeClass("show-menu");
+        $(this).parent().siblings().children("a").removeClass("menu-opened");
+        $(this).parent().siblings().children("a").children(".material-icons").html("arrow_drop_down_circle");
+
+        // if this menu is not open
+        if ($(this).next("ul").hasClass("show-menu")) {
+            $(this).next("ul").removeClass("show-menu");
+            $(this).children(".material-icons").html("arrow_drop_down_circle");
+        } else {
+        // show this menu
+        $(this).siblings('ul').addClass("show-menu");
+        $(this).addClass("menu-opened");
+        $(this).children(".material-icons").html("arrow_drop_up");
+        }
+
+        
+    });
+
+    $(".treeview ul>li>a").on('click', function () {
+        $(".sub-menu-item-active").removeClass("sub-menu-item-active");
+        $(this).addClass("sub-menu-item-active");
+    });
+    
+    var containers = [];
+    var liquids = [];
+    $.ajax({
+        type: 'get',
+        url: "../../api/Container/GetAll",
+        dataType: 'json',
+        async: false,
+        contentType: 'application/json',
+        success: function (response) {
+            containers = response;
+        },
+        error: function (response) {
+            console.log("failure" + response);
+        }
+    });
+    $.ajax({
+        type: 'get',
+        url: "../../api/LiquidTypes/GetAll",
+        dataType: 'json',
+        async: false,
+        contentType: 'application/json',
+        success: function (response) {
+            liquids = response;
+        },
+        error: function (response) {
+            console.log("failure" + response);
+        }
+    });
+
+</script>

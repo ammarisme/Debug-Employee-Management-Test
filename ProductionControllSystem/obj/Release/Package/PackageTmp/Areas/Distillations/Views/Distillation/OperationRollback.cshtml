@@ -1,0 +1,192 @@
+﻿@using ProductionControllSystem.Areas.Distillations.Models;
+@using ClassLibrary.DatabaseModels;
+
+@model   OperationRollbackViewModel
+@{
+    ViewBag.title = "Rollback Operations";
+}
+<title>@ViewBag.title</title>
+
+<div class="col-md-12 panel sub-content-panel ">
+    <h5>Operations</h5>
+    <table id="operations-table" class="display table table-hover table-striped" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <td>Id</td>
+               <td>Created Time</td>
+                <td>Operated Date</td>
+                <td>Operation Type</td>
+                <td>From</td>
+                <td>To</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(LiquidTransfer operation in Model.operations)
+            {
+                <tr>
+                    <td>@operation.Id</td>
+                    <td>@operation.CreatedTime</td>
+                    <td>@operation.TransferTime</td>
+                    <td>@operation.TransferType</td>
+                    <td>@operation.FromContainer</td>
+                    <td>@operation.ToContainer</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+<div class="col-md-12 panel sub-content-panel" id="report-parameter-panel">
+        @*@Html.TextBoxFor(m => m.User, new { @class = "form-control hidden" })
+        @Html.TextBoxFor(m => m.Location, new { @class = "form-control hidden" })
+        @Html.TextBoxFor(m => m.ReportName, new { @class = "form-control hidden" })*@
+
+        <div id="name-group" class="form-group col-md-4">
+            <div class="col-md-12">
+                <button class="btn btn-danger btn-raised" style="width:100%" id="rollback-button">Rollback Last Operation</button>
+            </div>
+            <div class="col-md-12">
+                <button class="btn btn-update btn-raise  hidden-xs" style="width:100%" id="print-report-button">Print Report</button>
+            </div>
+        </div>
+</div>
+<iframe id="ManualFrame"
+        frameborder="0"
+        style="border:0"
+        allowfullscreen
+        typeof="application/pdf"
+        ></iframe>
+@section script{
+    <script>
+        var reportTableId = "operations-table";
+        var reportName = "Operations report";
+        var transferId = null;
+        var reportTable = initiateTable1_2("operations-table",
+                                {
+                                    "order": [[0, "asc"]],
+                                    "rowCallback": function (row, data, index) {
+                                    },
+                                    "pageLength": 100,
+                                    "columns": [
+                                                { "data": "Id" },
+                                                { "data": "CreatedTime" },
+                                                { "data": "TransferTime" },
+                                                { "data": "TransferType" },
+                                                { "data": "FromContainer" },
+                                                { "data": "ToContainer" }
+                                                ],
+                                    "sDom": "t",
+                                    "language": {
+                                        "emptyTable": "No Operations."
+                                    }
+                                }
+                            , function () {
+                            }, function () {
+                            }, function () { });
+
+        $("#rollback-button").on('click', function () {
+            
+            showModalMessage("Are you sure.?",
+                '<button type="button" onClick="rollBackOperation()" class="btn btn-danger btn-raised" data-dismiss="modal">Yes<div class="ripple-container"><div class="ripple ripple-on ripple-out" style="left: 19.5104px; top: 23.5868px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div><div class="ripple ripple-on ripple-out" style="left: 19.5104px; top: 23.5868px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div><div class="ripple ripple-on ripple-out" style="left: 10.5104px; top: 26.1423px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div></div></button>' +
+                '<button type="button" class="btn btn-primary btn-raised" data-dismiss="modal">No<div class="ripple-container"><div class="ripple ripple-on ripple-out" style="left: 19.5104px; top: 23.5868px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div><div class="ripple ripple-on ripple-out" style="left: 19.5104px; top: 23.5868px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div><div class="ripple ripple-on ripple-out" style="left: 10.5104px; top: 26.1423px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div></div></button>'
+                );
+        });
+        $(".navigation-help").html("Operations / Rollback");
+
+        var d = new Date();
+        d.setFullYear(d.getFullYear() - 100);
+        $('.datepicker').pickadate({
+            // Escape any “rule” characters with an exclamation mark (!).
+            format: 'yyyy-mm-dd',
+            selectYears: d,
+            max: new Date(),
+            selectMonths: true, // Creates a dropdown to control month
+            selectYears: 15 // Creates a dropdown of 15 years to control year
+        });
+        
+        function rollBackOperation() {
+           
+            $.ajax({
+                type: 'get',
+                url: "../../api/RollbackTransfer?transferId=" + reportTable.data()[reportTable.data().length - 1].Id,
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (response) {
+                    showModalMessage("Operation success", response);
+                    var d = reportTable.data();
+                    d.splice(d.length - 1, 1);
+                    reportTable = initiateTable1_2("operations-table",
+                                {
+                                    "order": [[0, "asc"]],
+                                    "rowCallback": function (row, data, index) {
+                                    },
+                                    "data": d,
+                                    "pageLength": 100,
+                                    "columns": [
+                                                { "data": "Id" },
+                                                { "data": "CreatedTime" },
+                                                { "data": "TransferTime" },
+                                                { "data": "TransferType" },
+                                                { "data": "FromContainer" },
+                                    { "data": "ToContainer" }
+                                    ],
+                                    "sDom": "t",
+                                    "language": {
+                                        "emptyTable": "No Operations."
+                                    }
+                                }
+                            , function () {
+                            }, function () {
+                            }, function () { });
+                },
+                error: function (response) {
+                    showModalMessage("Operation rollback failed", "Please contact support.");
+                }
+            });
+        }
+
+        $("#print-report-button").on('click', function () {
+            var doc = new jsPDF('p', 'pt', 'A4');
+            setHeader(doc, reportName);
+            var pageHeight = doc.internal.pageSize.height;
+            var y = 120;
+
+            doc.setFontSize(10);
+            
+            var i = 0;
+            var previousTableHeight = 0;
+
+            if (!$("#" + reportTableId).is(":visible") || $("#" + reportTableId).hasClass("picker__table")) {
+                return;
+            }
+            var tableId = reportTableId
+            var tableHeight = parseFloat(getTableHeight(reportTableId));
+
+
+            if (i > -1) {
+                y = y + 50 + previousTableHeight;
+                //if (y + tableHeight >= pageHeight - 30) {
+                //    doc.addPage();
+                //    y = 40;
+                //}
+
+                y = y + 10;
+                var res = doc.autoTableHtmlToJson(document.getElementById(reportTableId), true);
+                doc.autoTable(res.columns, res.data, { margin: { top: y } });
+                previousTableHeight = tableHeight;
+            }
+
+            doc.autoPrint();
+            
+            $("#ManualFrame").attr("height", screen.height);
+            $("#ManualFrame").attr("width", $("#report-parameter-panel").width());
+            $("#ManualFrame").attr("src", doc.output('datauri'));
+            
+            event.preventDefault();
+        });
+        MaterialSelectReinitiate("select[name='Container']", 4);
+    </script>
+}

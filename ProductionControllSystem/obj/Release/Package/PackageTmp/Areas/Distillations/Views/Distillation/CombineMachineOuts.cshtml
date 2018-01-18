@@ -1,0 +1,285 @@
+﻿@using ProductionControllSystem.Areas.Processing.Models;
+@using ClassLibrary.DatabaseModels;
+
+@model   CombineMachineOutsViewModel
+@{
+    ViewBag.title = "Combine Machine outs";
+}
+<title>@ViewBag.title</title>
+
+<div class="col-md-12 panel sub-content-panel ">
+    <h5>Machine outs</h5>
+    <table id="operations-table" class="display table table-hover table-striped" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <td>Id </td>
+                <td>Date</td>
+                <td>Machine</td>
+                <td>Reciever</td>
+                <td>Sprit</td>
+                <td>Dip</td>
+                <td>Transfered Bulk(l)</td>
+                <td>Strength</td>
+                <td>A/A(l)</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(LiquidTransfer operation in Model.operations)
+            {
+                <tr>
+                    <td>@operation.Id</td>
+                    <td>@operation.TransferTime</td>
+                    <td>@operation.FromContainer</td>
+                    <td>@operation.ToContainer</td>
+                    <td>@operation.LiquidType</td>
+                    <td>@operation.DestinationDepthFrom - @operation.DestinationDepthTo</td>
+                    <td>@operation.DestinationBulkVolume</td>
+                    <td>@operation.DestinationStrength</td>
+                    <td>@operation.DestinationPureVolume</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="col-md-12 panel sub-content-panel" id="process-div">
+    <form action="no-implementation" id="combine-form">
+        <div class="row">
+        <div id="name-group" class="form-group col-md-2">
+            <div class="col-md-12">
+                <label for="name" class="custom-label">Vat: </label>
+            </div>
+            <div class="col-md-12 input-field">
+                @if (Model.ToContainer.Count > 0)
+            {
+                    @Html.DropDownListFor(m => m.ToContainer,
+                                  new SelectList(Model.ToContainer,
+                               "Id", "ContainerName",
+                                        Model.ToContainer.First().Id), new { @class = "form-control ", id = "Id", name = "ToContainer" })
+            }
+            else
+            {
+                    <label class="custom-label">No Vat.</label>
+            }
+            </div>
+        </div>
+
+        <div id="name-group" class="form-group col-md-2">
+            <label for="name" class="custom-label">Current Dip(cm)</label>
+            @Html.TextBoxFor(m => m.DestinationDepthFrom, new { @class = "form-control disabled", required = "true", tabindex = "-1", type = "number", step = "0.01" })
+        </div>
+        
+        <div id="name-group" class="form-group col-md-2">
+            <label for="name" class="custom-label">Final Dip (cm)</label>
+            @Html.TextBoxFor(m => m.DestinationDepthTo, new { @class = "form-control custom-text-box", required = "true", type = "number", step = "0.01", min = 0 })
+        </div>
+                
+        <div id="name-group" class="form-group col-md-2">
+            <label for="name" class="custom-label">Temperature(C)</label>
+            @Html.TextBoxFor(m => m.DestinationTemperature, new { @class = "form-control custom-text-box" })
+        </div>
+
+        <div id="name-group" class="form-group col-md-2">
+            <label for="name" class="custom-label">Density(C)</label>
+        @Html.TextBoxFor(m => m.DestinationDensity, new { @class = "form-control custom-text-box" })
+        </div>
+        
+        </div>
+        
+
+        <div class="row">
+        <div id="name-group" class="form-group col-md-2">
+            <label for="name" class="custom-label">Strength</label>
+            @Html.TextBoxFor(m => m.DestinationStrength, new { @class = "form-control disabled", tabindex = "-1", type = "number", step = "0.01" })
+        </div>
+        <div id="name-group" class="form-group col-md-2">
+            <label for="name" class="custom-label">Bulk (l):</label>
+            @Html.TextBoxFor(m => m.DestinationBulkVolume, new { @class = "form-control disabled", tabindex = "-1", required = "true", type = "number", step = "0.01" })
+        </div>
+        <div id="name-group" class="form-group col-md-2">
+            <label for="name" class="custom-label">A/A (l):</label>
+            @Html.TextBoxFor(m => m.DestinationPureVolume, new { @class = "form-control disabled", tabindex = "-1", required = "true", type = "number", step = "0.01" })
+        </div>
+            <div class="col-md-2"></div>
+        <div id="name-group" class="form-group col-md-2">
+                <button class="btn btn-danger btn-raised" style="width:100%" id="process-button">Process</button>
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+@section script{
+    <script>
+        var toContainer = null;
+        var machineOutTableId = "operations-table";
+        var reportName = "Operations report";
+        var transferId = null;
+        var obj = null;
+        var machineOutTable = initiateTable1_2("operations-table",
+                                {
+                                    "order": [[0, "asc"]],
+                                    "rowCallback": function (row, data, index) {
+                                    },
+                                    "pageLength": 100,
+                                    "columns": [
+                                                { "data": "Id" },
+                                                { "data": "OutputTime" },
+                                                { "data": "ContainerId" },
+                                                { "data": "DistillationMachineId" },
+                                                { "data": "LiquidTypeId" },
+                                                { "data": "ContainerToDepth" },
+                                                { "data": "TransferVolume" },
+                                                { "data": "Strength" },
+                                                { "data": "TransferPureVolume" }
+                                                ],
+                                    "sDom": "t",
+                                    "language": {
+                                        "emptyTable": "No Operations."
+                                    }
+                                }
+                            , function () {
+                            }, function () {
+                            }, function () { });
+
+        $("#combine-button").on('click', function () {
+            $("#process-button").removeClass("hidden");            
+        });
+
+        $("#combine-form").on('submit', function (e) {
+            var transfers = getSelectedRowData("operations-table");
+            obj = getFormValues("combine-form");
+            obj["Transfers"]= new Array();
+
+            for (var id in transfers) {
+                if (!isNaN(parseFloat(transfers[id]))) {
+                obj["Transfers"].push({"Id" :transfers[id]});
+                }
+            }
+
+            showModalMessage("You are about to process transfers.",
+                '<button type="button" onClick="processTransfers()" class="btn btn-danger btn-raised" data-dismiss="modal">Yes, proceed.<div class="ripple-container"><div class="ripple ripple-on ripple-out" style="left: 19.5104px; top: 23.5868px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div><div class="ripple ripple-on ripple-out" style="left: 19.5104px; top: 23.5868px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div><div class="ripple ripple-on ripple-out" style="left: 10.5104px; top: 26.1423px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div></div></button>' +
+                '<button type="button" class="btn btn-primary btn-raised" data-dismiss="modal">No<div class="ripple-container"><div class="ripple ripple-on ripple-out" style="left: 19.5104px; top: 23.5868px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div><div class="ripple ripple-on ripple-out" style="left: 19.5104px; top: 23.5868px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div><div class="ripple ripple-on ripple-out" style="left: 10.5104px; top: 26.1423px; background-color: rgba(0, 0, 0, 0.87); transform: scale(9.625);"></div></div></button>'
+                );
+            console.log(obj);
+            e.preventDefault();
+        });
+
+        $("input[name=DestinationDepthTo]").on("change", function () {
+            var volume = getVolume(toContainer["containerId"], toContainer["currentDepth"] ,$(this).val());
+            volume = !isNaN(parseFloat(volume)) ? parseFloat(parseFloat(volume)) : 0;
+            var strength = !isNaN(parseFloat($("input[name=DestinationStrength]").val())) ? parseFloat($("input[name=DestinationStrength]").val()) : 0;
+            var pureVolume = (volume * strength /100).toFixed(1);
+            $("input[name=DestinationBulkVolume]").val(volume);
+            $("input[name=DestinationPureVolume]").val(pureVolume);
+        });
+
+        $("input[name=DestinationTemperature]").on("change", function () {
+            updateStrength();
+        });
+        $("input[name=DestinationDensity]").on("change", function () {
+            updateStrength();
+        });
+
+        $("select[name=ToContainer]").change(function () {
+                if ($(this).val() == "0") {
+                    $("#liquid-percentage-from").removeAttr("style");
+                    MaterialSelectReinitiate("select[name='LiquidTypeId']", 0)
+                    toContainer["currentDepth"] = 0;
+                    $("input[name='DestinationDepthFrom']").val("0");
+                    $("input[name='DestinationDepthTo']").val("0");
+                    $("input[name='DestinationDensity']").val("0");
+                    $("input[name='DestinationTemperature']").val("0");
+                    $("input[name='DestinationStrength']").val("0");
+                    $("input[name='DestinationBulkVolume']").val("0");
+                    $("input[name='DestinationPureVolume']").val("0");
+                    $("input[name='Wastage']").val("0");
+
+                    var sourceDepth = !isNaN(parseFloat($("input[name=FinalDip]").val())) ? parseFloat($("input[name=FinalDip]").val()) : parseFloat($("input[name=CurrentDip]").val());
+                    var destinationDepth = !isNaN(parseFloat($("input[name=DestinationDepthTo]").val())) ? parseFloat($("input[name=DestinationDepthTo]").val()) : parseFloat($("input[name=DestinationDepthFrom]").val());
+                    updateContainerImages(sourceDepth, destinationDepth);
+                    return;
+                }
+            
+                toContainer = getContainerFromDb("" + $(this).val() + "");
+            //if (parseFloat(toContainer["currentDepth"]) > 0 && toContainer["liquidTypeId"] != $("select[name='LiquidTypeId']").val()) {
+            //    MaterialSelectReinitiate("select[name='ToContainer']", 0);
+            //    MaterialSelectReinitiate("select[name='LiquidTypeId']", 0)
+            //    toContainer["currentDepth"] = 0;
+            //    $("input[name='DestinationDepthFrom']").val("0");
+            //    $("input[name='DestinationDepthTo']").val("0");
+            //    $("input[name='DestinationDensity']").val("0");
+            //    $("input[name='DestinationTemperature']").val("0");
+            //    $("input[name='DestinationStrength']").val("0");
+            //    $("input[name='DestinationBulkVolume']").val("0");
+            //    $("input[name='Wastage']").val("0");
+
+            //    var sourceDepth = !isNaN(parseFloat($("input[name=FinalDip]").val())) ? parseFloat($("input[name=FinalDip]").val()) : parseFloat($("input[name=CurrentDip]").val());
+            //    var destinationDepth = !isNaN(parseFloat($("input[name=DestinationDepthTo]").val())) ? parseFloat($("input[name=DestinationDepthTo]").val()) : parseFloat($("input[name=DestinationDepthFrom]").val());
+            //    updateContainerImages(sourceDepth, destinationDepth);
+            //    return;
+            //}
+
+            var capacity = parseFloat((typeof toContainer["capacity"] != 'undefined' && toContainer["capacity"] != "") ? toContainer["capacity"] : "0");
+            var density = parseFloat((typeof toContainer["density"] != 'undefined' && toContainer["density"] != "") ? toContainer["density"] : "0") / 1000;
+            var volume = parseFloat((typeof toContainer["fillVolume"] != 'undefined' && toContainer["fillVolume"] != "") ? toContainer["fillVolume"] : "0");
+
+            $("input[name='DestinationDepthFrom']").val(toContainer["currentDepth"]);
+            $("input[name='DestinationDepthTo']").val("");
+            $("input[name='DestinationDepthTo']").attr("min", toContainer["currentDepth"]);
+            $("input[name='DestinationDepthTo']").attr("max", toContainer["maxDepth"]);
+
+            // reset destination table
+            $("input[name='DestinationDepthTo']").val("");
+            $("input[name='DestinationTemperature']").val("");
+            $("input[name='DestinationDensity']").val("");
+            $("input[name='DestinationStrength']").val("");
+            $("input[name='DestinationPureVolume']").val("");
+            $("input[name='DestinationBulkVolume']").val("");
+            $("input[name='Wastage']").val("");
+            $("input[name='PureWastage']").val("");
+        });
+
+        $("#combine-form").on("submit", function (e) {
+            console.log(getSelectedRows("operations-table"));
+            e.preventDefault();
+        })
+
+        $(".navigation-help").html("Distillation / Combine Production");
+
+        function processTransfers() {
+            sendObjectToServer("../../api/Distillation/CombineTransfers", obj,
+               function () {
+                   showModalMessage("Distillation", "Selected transfers combined.");
+                   $("#process-transfers-button").addClass("disabled");
+                   return;
+               }, function () {
+                   showModalMessage("Error", "");
+               });
+        }
+
+
+        function updateStrength() {
+            var density = !isNaN(parseFloat($("input[name=DestinationDensity]").val())) ? parseFloat($("input[name=DestinationDensity]").val()) : 0;
+            var temperature = !isNaN(parseFloat($("input[name=DestinationTemperature]").val())) ? parseFloat($("input[name=DestinationTemperature]").val()) : 0;
+            var volume = !isNaN(parseFloat($("input[name=DestinationBulkVolume]").val())) ? parseFloat($("input[name=DestinationBulkVolume]").val()) : 0;
+
+            if (density * temperature * volume == 0) {
+                return;
+            } else {
+                var strength = getStrength(density, temperature);
+                strength = !isNaN(strength) ? parseFloat(strength) : 0;
+                var pureVolume = (volume * strength / 100).toFixed(1);
+                $("input[name=DestinationStrength]").val(strength);
+                $("input[name=DestinationPureVolume]").val(pureVolume);
+            }
+        }
+
+
+    </script>
+}

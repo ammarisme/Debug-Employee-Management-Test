@@ -1,0 +1,172 @@
+﻿@using ProductionControllSystem.Areas.Distillations.Models
+
+@model  IntakeToddyModel
+@{
+    ViewBag.Title = "Intake Toddy";
+
+}
+<script src="~/Scripts/mdDateTimePicker.js"></script>
+<title>@ViewBag.title</title>
+<h5>@ViewBag.title</h5>
+f
+<div class="panel sub-content-panel col-md-12">
+    <form action="no-implementation" id="liquidInput-form" method="POST">
+        <div class="col-md-12">
+            <div id="name-group" class="form-group col-md-3 form-group-custom">
+                <label for="name" class="custom-label">Bulk Toddy (l)</label>
+                @Html.TextBoxFor(m => m.BulkVolume, new { @class = "form-control custom-text-box", required = "true", min = 1, type = "number", step = "0.01", autocomplete = "off" })
+            </div>
+            <div id="name-group" class="form-group col-md-3">
+                <label for="name" class="custom-label">Pure Toddy(l)</label>
+                @Html.TextBoxFor(m => m.PureVolume, new { @class = "form-control custom-text-box", required = "true", max = Model.CurrentVolume, min = 1, type = "number", step = "0.01", autocomplete = "off" })
+            </div>
+            <div id="name-group" class="form-group col-md-3">
+                <label for="name" class="custom-label">Remarks</label>
+                @Html.TextBoxFor(m => m.Remarks, new { @class = "form-control custom-text-box", type = "text" })
+            </div>
+            <div id="name-group" class="form-group col-md-3">
+                <label for="name" class="custom-label">Avg. Strength</label>
+                @Html.TextBoxFor(m => m.Strength, new { @class = "form-control disabled", required = "true", type = "number", step = "0.01", autocomplete = "off", tabindex = "-1" })
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div id="name-group" class="form-group col-md-3">
+                <label for="name" class="custom-label">Intake Date</label>
+                <span class="input-group-addon custom-datepicker form-control">
+                    <span class="glyphicon glyphicon-calendar date-icon"></span>
+                    @Html.TextBoxFor(m => m.InputDateTime, new { @class = "form-control custom-text-box datepicker", required = "true" })
+                </span>
+            </div>
+            <div id="name-group" class="form-group col-md-3">
+                <label for="name" class="custom-label">Available Bulk Toddy (l):</label>
+                @Html.TextBoxFor(m => m.CurrentVolume, new { @class = "form-control disabled", tabindex = "-1", step = "0.1", autocomplete = "off" })
+            </div>
+            <div id="name-group" class="form-group col-md-3">
+                <label for="name" class="custom-label">Available Pure Toddy (l):</label>
+                @Html.TextBoxFor(m => m.CurrenPureVolume, new { @class = "form-control disabled", tabindex = "-1", step = "0.1", autocomplete = "off" })
+            </div>
+        </div>
+
+        @Html.TextBoxFor(m => m.CreatedUser, new { @class = "form-control hidden" })
+        @Html.TextBoxFor(m => m.LocationId, new { @class = "form-control hidden" })
+        
+        <div id="name-group" class="form-group col-md-12">
+            <input type="submit" class="btn btn-primary btn-raised pull-right" value="Intake Toddy" />
+        </div>
+    </form>
+    <div id="name-group" class="form-group col-md-12">
+        <input type="submit" id="intake-history-button" class="btn btn-warning btn-raised pull-right" value="Intake History" />
+    </div>
+</div>
+
+<div class="col-md-12 panel sub-content-panel hidden">
+    <h5>Toddy Intakes</h5>
+    <table id="intake-table" class="display table table-hover table-striped" cellspacing="0" width="100%">
+        <thead>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+            <tr></tr>
+        </tfoot>
+    </table>
+</div>
+
+@section script
+    {
+    <script>
+
+        $("#liquidInput-form").on('submit', function (event) {
+            var data = getFormValues("liquidInput-form");
+            var error = "";
+            var strength = !isNaN(parseFloat(data["Strength"])) ? parseFloat(data["Strength"]) : 0;
+            error = $("input[name=InputDateTime]").val() == "" ? error + '<div class="alert alert-danger col-md-12">Please enter toddy intake date.</div>' : error;
+            error = !(strength <= 7.5 && strength >= 4) ? error + '<div class="alert alert-danger col-md-12">Invalid pure and bulk volumes found</div>' : error;
+
+            if (error != "") {
+                showModalMessage("Error", error);
+                event.preventDefault();
+                return;
+            } else {
+                sendObjectToServer("../../api/Distillation/AddToddy", data,
+                   function () {
+                       $("input[name=CurrentVolume]").val(parseFloat($("input[name=BulkVolume]").val()) + parseFloat(data["CurrentVolume"]))
+                       $("input[name=CurrenPureVolume]").val(parseFloat($("input[name=PureVolume]").val()) + parseFloat($("input[name=CurrenPureVolume]").val()))
+                       showModalMessage("Toddy intake", "Toddy intake successfully added to your location");
+                       $("#liquidInput-form input[type=submit]").addClass("disabled");
+                   }, function (data) {
+                       showModalMessage("Error", "");
+                   });
+                event.preventDefault();
+            }
+        });
+
+        var d = new Date();
+        d.setFullYear(d.getFullYear() - 100);
+        $('.datepicker').pickadate({
+            // Escape any “rule” characters with an exclamation mark (!).
+            format: 'yyyy-mm-dd',
+            selectYears: d,
+            max: new Date(),
+            selectMonths: true, // Creates a dropdown to control month
+            selectYears: 15 // Creates a dropdown of 15 years to control year
+        });
+
+        var intakeData = new Array();
+        var intakeTable = $("#intake-table").parent().html();
+
+        $("#intake-history-button").click(function () {
+            if ($("input[name=InputDateTime]").val() == "") {
+                showModalMessage("Error", '<div class="alert alert-danger col-md-12">Please choose a date</div>');
+            }
+            if ($("#intake-table").hasClass("dataTable")) {
+                // Reset intake table
+                $("#intake-table").parent().parent().html(intakeTable)
+                $("#intake-table").parent().addClass("hidden");
+            }
+
+            $.ajax({
+                type: 'get',
+                url: "../../api/LiquidInput/GetToddyIntakes?date=" + $("input[name=InputDateTime]").val(),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (response) {
+                    intakeData = response;
+                    if (typeof (intakeData) != 'undefined' && intakeData.length > 0) {
+                        $("#intake-table").parent().removeClass("hidden");
+                        initiateTable1("intake-table",
+                            {
+                                "footer": true,
+                                "bLengthChange": false,
+                                "aaData": intakeData
+                                ,
+                                "aoColumns": [
+                                          { "sTitle": "Date", "mData": "inputDateTime" },
+                                          { "sTitle": "Bulk(l)", "mData": "bulkVolume" },
+                                          { "sTitle": "Pure Litres(l)", "mData": "pureVolume" },
+                                          { "sTitle": "Remark", "mData": "remarks" }
+                                ]
+                            }
+                        , function () { }, function () { });
+                    } else {
+                        showModalMessage("No records", "There are no toddy intakes recorded for the selected date.");
+                    }
+                },
+                error: function (response) {
+                    showModalMessage("No records", "There are no toddy intakes recorded for the selected date.");
+                }
+            });
+
+        });
+
+        $("input[name=BulkVolume] , input[name=PureVolume]").on('change', function () {
+            var bulkVolume = !isNaN($("input[name=BulkVolume]").val()) ? parseFloat($("input[name=BulkVolume]").val()) : 0;
+            var pureVolume = !isNaN($("input[name=BulkVolume]").val()) ? parseFloat($("input[name=PureVolume]").val()) : 0;
+
+            $("input[name=Strength]").val(((pureVolume / bulkVolume) * 7.5).toFixed(1));
+            $("input[name=PureVolume]").attr("max", bulkVolume);
+            $("input[name=PureVolume]").attr("min", parseFloat(bulkVolume * (4 / 7.5)).toFixed(1));
+        });
+
+        $(".navigation-help").html("Distillation / Toddy Intake");
+    </script>
+}

@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+@if (IsSectionDefined("head"))
+{
+    @RenderSection("head");
+}
+else
+{
+    @Html.Partial("~/Areas/Accounts/Views/Shared/default_head.cshtml");
+}
+
+<body>
+    @Html.Partial("_Loader")
+    <!-- The Navigation Bar -->
+    @if (IsSectionDefined("navbar"))
+    {
+        RenderSection("navbar");
+    }
+    else
+    {
+        @Html.Partial("~/Areas/Accounts/Views/Shared/default_navbar.cshtml");
+    }
+
+    @* Modals *@
+    @if (IsSectionDefined("modals"))
+    {
+        RenderSection("modals");
+    }
+    else
+    {
+        @Html.Partial("~/Areas/Accounts/Views/Shared/default_modals.cshtml");
+    }
+
+    <div class="container content-panel">
+        <!-- Body -->
+        @RenderBody()
+    </div>
+    <!-- Footer -->
+    @if (IsSectionDefined("footer"))
+    {
+        @RenderSection("footer", false);
+    }
+    else
+    {
+        @Html.Partial("~/Areas/Accounts/Views/Shared/default_footer.cshtml");
+    }
+
+
+    @if (IsSectionDefined("external_scripts"))
+    {
+        @RenderSection("external_scripts");
+    }
+    else
+    {
+        @Html.Partial("~/Areas/Accounts/Views/Shared/default_external_scripts.cshtml");
+    }
+
+    @if (IsSectionDefined("required_scripts"))
+    {
+        @RenderSection("required_script");
+    }
+    else
+    {
+        @Html.Partial("~/Areas/Accounts/Views/Shared/required_script.cshtml");
+    }
+
+
+    @if (IsSectionDefined("script"))
+    {
+        @RenderSection("script");
+    }
+    else
+    {
+        @Html.Partial("~/Areas/Accounts/Views/Shared/default_script.cshtml");
+    }
+    @Html.Partial("~/Areas/Accounts/Views/Shared/inter_view_script.cshtml");
+</body>
+</html>

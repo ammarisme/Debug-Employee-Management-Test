@@ -1,0 +1,28 @@
+﻿
+<script>
+    // this script will be executed after each view in .content-panel loads
+
+    if ($("title").html()=="Dashboard") {
+        $("#dashboard-link").hide();
+    } else {
+        $("#dashboard-link").show();
+    }
+    if ($("title").html()== " Log In") {
+        $("body").attr("style", style = "background-image : url(/Content/images/dcsl-login.jpg);background-repeat:no-repeat; background-size: cover;");
+        $(".navbar").addClass("hidden");
+    } else {
+        $("body").removeAttr();
+        $(".navbar").removeClass("hidden");
+    }
+    
+    $.pjax.defaults.timeout = false;
+
+    $('a[withpjax]').each(function () {
+        
+        $(this).pjax(
+            {
+                container: ".content-panel",
+            }
+        );
+    });
+    </script>

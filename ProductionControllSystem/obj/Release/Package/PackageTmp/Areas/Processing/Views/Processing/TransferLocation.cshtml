@@ -1,0 +1,278 @@
+﻿@using ProductionControllSystem.Areas.Processing.Models
+
+@model  TransferLiquidViewModel
+@{
+    ViewBag.Title = "Transfer Liquid";
+
+}
+
+<title>@ViewBag.title</title>
+ <h5>@ViewBag.title</h5>
+
+<div class="panel sub-content-panel col-md-12">
+    <form action="no-implementation" id="liquidTransfer-form" method="POST">        
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label">From Container : </label>
+            @Html.DropDownListFor(m => m.FromContainer,
+                                  new SelectList(Model.FromContainer,
+                               "ContainerId", "ContainerName",
+                                        Model.FromContainer.First().ContainerId), new { @class = "form-control custom-text-box  custom-label", id = "ContainerId", name= "FromContainer" })
+        </div>
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label">To Container : </label>
+            @Html.DropDownListFor(m => m.ToContainer,
+                                  new SelectList(Model.ToContainer,
+                               "ContainerId", "ContainerName",
+                                        Model.FromContainer.First().ContainerId), new { @class = "form-control custom-text-box  custom-label", id = "ContainerId", name = "ToContainer" })
+        </div> 
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label">Liquid Type : </label>
+            @Html.DropDownListFor(m => m.LiquidTypeId,
+                                  new SelectList(Model.LiquidTypeId,
+                               "LiquidType", "LiquidName",
+                                        Model.LiquidTypeId.First().LiquidType), new { @class = "form-control custom-text-box  custom-label", id = "LiquidType", name = "LiquidType" })
+        </div>
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label">Weight (Kg)</label>
+            <input name="Weight" class="form-control custom-text-box" required type="number" step="0.01" />
+        </div>
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label">Temperature (C)</label>
+            <input name="Temperature" class="form-control custom-text-box" required type="number" step="0.01" />
+        </div>
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label">Density (Kg/l)</label>
+            <input name="Density" class="form-control custom-text-box" required type="number" step="0.01" />
+        </div>
+        
+        <div id="name-group" class="form-group col-md-3">
+            <label for="name" class="custom-label">Strength</label>
+            <input name="Strength" class="form-control custom-text-box" required type="number" step="0.01" />
+        </div>
+        <div id="name-group" class="form-group col-md-4">
+            <label for="name" class="custom-label">Transfer time</label>
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+                <input name="TransferTime" value="" class="datepicker">
+            </span>
+        </div>
+         <input class="hidden" name="CreatedUser" value="@Session["UserId"]" />
+        <div id="name-group" class="form-group col-md-4">
+            <input type="submit" class="btn btn-primary btn-raised" value="Transfer" />
+        </div>
+
+</form>
+</div>
+<div class="panel sub-content-panel col-md-12">
+    <div class="col-md-6">
+        <div class="col-md-6 vat_div">
+            <div class="progress vertical-sibling">
+                <div id="liquid-percentage-from" class="progress-bar  progress-bar-striped " role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width: 40%;">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label id="from-container-capacity" style="color:black; font-size:20px" for="name" class="custom-label" class="pull-left">Capacity (l) : </label>
+            </div>
+            <div class="row">
+                <label id="from-container-weight" style="color:black; font-size:20px" for="name" class="custom-label" class="pull-left">Weight (kg) : </label>
+            </div>
+            <div class="row">
+                <label id="from-container-volume" style="color:black; font-size:20px" class="pull-left">Volume (l) : </label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="col-md-6 vat_div">
+            <div class="progress vertical-sibling" >
+                <div id="liquid-percentage-to" class="progress-bar  progress-bar-striped " role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width: 40%;">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label id="to-container-capacity" style="color:black; font-size:20px" for="name" class="custom-label" class="pull-left">Capacity (l) : </label>
+            </div>
+            <div class="row">
+                <label id="to-container-weight" style="color:black; font-size:20px" for="name" class="custom-label" class="pull-left">Weight (kg) : </label>
+            </div>
+            <div class="row">
+                <label id="to-container-volume" style="color:black; font-size:20px" class="pull-left">Volume (l) : </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section script
+    {
+    <script>
+        $("#liquidTransfer-form").on('submit', function (event) {
+            var error="";
+            error = $("input[name=TransferTime]").val() == "" ? error + "</br>Please enter from date." : error;
+
+            if (error != "") {
+                showModalMessage("Error", error);
+            } else {
+                var data = getFormValues("liquidTransfer-form");
+                sendObjectToServer("../../api/LiquidTransfer/", data,
+                   function () {
+                       showModalMessage("Liquid Transfered", "Liquid transfered between containers.");
+                   }, function (data) {
+                       showModalMessage("Error", "Please contact xxx xxx xxx");
+                   });
+                event.preventDefault();
+            }
+        });
+        
+        var d = new Date();
+        d.setFullYear(d.getFullYear() - 100);
+        $('.datepicker').pickadate({
+            // Escape any “rule” characters with an exclamation mark (!).
+            format: 'yyyy-mm-dd',
+            selectYears: d,
+            max: new Date(),
+            selectMonths: true, // Creates a dropdown to control month
+            selectYears: 15 // Creates a dropdown of 15 years to control year
+        });
+
+        $("select[name=FromContainer]").change(function () {
+            $.ajax({
+                type: 'get',
+                url: "../../api/Container/Get?containerId=" + $(this).val(),
+                dataType: 'json',
+                async: false,
+                contentType: 'application/json',
+                success: function (response) {
+                    var capacity = parseFloat((typeof response["capacity"] != 'undefined' && response["capacity"] != "") ? response["capacity"] : "0");
+                    var density = parseFloat((typeof response["density"] != 'undefined' && response["density"] != "") ? response["density"] : "0") / 1000;
+                    var volume = parseFloat((typeof response["volumeLitres"] != 'undefined' && response["volumeLitres"] != "") ? response["volumeLitres"] : "0");
+                    var weight = density * volume;
+
+                    var weightToAdd = parseFloat($("input[name=Weight]").val() != "" ? $("input[name=Weight]").val() : "0");
+                    // set container current weight
+                    $("#from-container-capacity").html("Capacity (kg) : " + capacity + " l");
+                    // set container current strength
+                    $("#from-container-weight").html("Weight (kg) : " + (weight + weightToAdd) + " kg");
+                    // set container current strength
+                    $("#from-container-volume").html("Volume (l) : " + volume + " l");
+
+                    $("#liquid-percentage-from").attr("style", "width : " + ((weight + weightToAdd) / capacity) * 100 + "%;");
+                },
+                error: function (response) {
+                    console.log("failure" + response);
+                }
+            });
+        });
+
+        $("select[name=ToContainer]").change(function () {
+            $.ajax({
+                type: 'get',
+                url: "../../api/Container/Get?containerId=" + $(this).val(),
+                dataType: 'json',
+                async: false,
+                contentType: 'application/json',
+                success: function (response) {
+                    var capacity = parseFloat((typeof response["capacity"] != 'undefined' && response["capacity"] != "") ? response["capacity"] : "0");
+                    var density = parseFloat((typeof response["density"] != 'undefined' && response["density"] != "") ? response["density"] : "0") / 1000;
+                    var volume = parseFloat((typeof response["volumeLitres"] != 'undefined' && response["volumeLitres"] != "") ? response["volumeLitres"] : "0");
+                    var weight = density * volume;
+                    var weightToAdd = parseFloat($("input[name=Weight]").val() != "" ? $("input[name=Weight]").val() : "0");
+                    // set container current weight
+                    $("#to-container-capacity").html("Capacity (kg) : " + capacity + " l");
+                    // set container current strength
+                    $("#to-container-weight").html("Weight (kg) : " + (weight + weightToAdd) + " kg");
+                    // set container current strength
+                    $("#to-container-volume").html("Volume (l) : " + volume + " l");
+
+                    $("#liquid-percentage-to").attr("style", "width : " + ((weight + weightToAdd) / capacity) * 100 + "%;");
+                },
+                error: function (response) {
+                    console.log("failure" + response);
+                }
+            });
+        });
+
+        $("input[name=Weight]").keyup(function () {
+            $.ajax({
+                type: 'get',
+                url: "../../api/Container/Get?containerId=" + $("select[name=FromContainer]").val(),
+                dataType: 'json',
+                async: false,
+                contentType: 'application/json',
+                success: function (response) {
+                    var capacity = parseFloat((typeof response["capacity"] != 'undefined' && response["capacity"] != "") ? response["capacity"] : "0");
+                    var density = parseFloat((typeof response["density"] != 'undefined' && response["density"] != "") ? response["density"] : "0")/1000;
+                    var volume = parseFloat((typeof response["volumeLitres"] != 'undefined' && response["volumeLitres"] != "") ? response["volumeLitres"] : "0");
+                    var weight = density * volume;
+                    var weightToAdd = parseFloat($("input[name=Weight]").val());
+                    weightToAdd = isNaN(weightToAdd) ? 0 : weightToAdd;
+                    if (!(weight > weightToAdd)) {
+                        $(this).val(weight);
+                        weightToAdd = weight;
+                    }
+                    // set container current strength
+                    $("#from-container-weight").html("Weight (kg) : " + (weight - weightToAdd) + " kg");
+
+                    $("#from-container-capacity").html("Capacity (l) : " + capacity+ " l");
+                    // set container current strength
+                    $("#from-container-volume").html("Volume (l) : " + volume + " l");
+
+                    $("#liquid-percentage-from").attr("style", "width : " + ((weight - weightToAdd) / capacity) * 100 + "%;");
+
+                },
+                error: function (response) {
+                    console.log("failure" + response);
+                }
+            });
+
+            $.ajax({
+                type: 'get',
+                url: "../../api/Container/Get?containerId=" + $("select[name=ToContainer]").val(),
+                dataType: 'json',
+                async: false,
+                contentType: 'application/json',
+                success: function (response) {
+                    var capacity = parseFloat((typeof response["capacity"] != 'undefined' && response["capacity"] != "") ? response["capacity"] : "0");
+                    var density = parseFloat((typeof response["density"] != 'undefined' && response["density"] != "") ? response["density"] : "0") / 1000;
+                    var volume = parseFloat((typeof response["volumeLitres"] != 'undefined' && response["volumeLitres"] != "") ? response["volumeLitres"] : "0");
+                    var weight = density * volume;
+
+                    var weightToAdd = parseFloat($("input[name=Weight]").val());
+                    weightToAdd = isNaN(weightToAdd) ? 0 : weightToAdd;
+                    // set container current strength
+                    $("#to-container-weight").html("Weight (kg) : " + (weight + weightToAdd) + " kg");
+                    // set container current strength
+                    $("#to-container-volume").html("Volume (l) : " + volume + " l");
+                    $("#to-container-capacity").html("Capacity (l) : " + capacity + " l");
+
+                    $("#liquid-percentage-to").attr("style", "width : " + ((weight + weightToAdd) / capacity) * 100 + "%;");
+
+                },
+                error: function (response) {
+                    console.log("failure" + response);
+                }
+            });
+        });
+
+        $('input[name=Density]').change(function () {
+            if ($('input[name=Temperature]').val() != '') {
+                $("input[name=Strength]").val(getStrength($(this).val(), $('input[name=Temperature]').val()));
+            } else {
+                $("input[name=Strength]").val('');
+            }
+        });
+
+        $('input[name=Temperature]').change(function () {
+            if ($('input[name=Density]').val() != '') {
+                $("input[name=Strength]").val(getStrength($('input[name=Density]').val(), $(this).val()));
+            } else {
+                $("input[name=Strength]").val('');
+            }
+        });
+
+        $(".navigation-help").html("Vats / Transfer Liquid");
+    </script>
+}
